@@ -19,6 +19,15 @@
 </head>
 <body>
 
+  <!-- Native Splash Screen -->
+  <div id="splashScreen" class="splash-screen">
+    <div class="splash-content">
+      <span class="splash-logo">⚡</span>
+      <h1 class="splash-title">ADDIS ACTIVE</h1>
+      <span class="splash-subtitle">BETA v1.0 • ALtitude 2,355M</span>
+    </div>
+  </div>
+
   <div id="offlineBanner" class="offline-banner" style="display:none;">
     <span>⚡ Offline Mode Active — Local routes and tracking work normally.</span>
   </div>
@@ -29,7 +38,7 @@
         <span class="brand-logo">⚡</span>
         <div>
           <h1 class="brand-name">ADDIS ACTIVE</h1>
-          <span class="brand-badge">BETA v1.0</span>
+          <span class="brand-badge">NATIVE PWA</span>
         </div>
       </div>
       <div class="header-actions">
@@ -40,6 +49,13 @@
   </header>
 
   <main id="appMain" class="app-main"></main>
+
+  <!-- Native Bottom Sheet Modal -->
+  <div id="detailModal" class="action-sheet-overlay">
+    <div class="action-sheet-content" id="detailModalContent">
+      <!-- Dynamic Details Render Here -->
+    </div>
+  </div>
 
   <div id="searchModal" class="search-modal">
     <div class="search-modal-content">
