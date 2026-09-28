@@ -1,84 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Addis Active | Discover Addis. Move Addis. Connect Addis.</title>
-  <meta name="description" content="Discover running, walking, cycling, hiking, fitness, communities, routes and active events across Addis Ababa." />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Addis Active | Discover, Move & Connect in Addis Ababa</title>
   
-  <meta name="theme-color" content="#080808" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="manifest" href="manifest.webmanifest" />
-  
+  <!-- PWA Manifest & Theme -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#080808">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Addis Active">
+
+  <!-- Google Fonts: Inter & Syne for High-Endurance Dark Identity -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@800;900&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS for OpenStreetMap integration -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+  <!-- Custom Application Styles -->
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
-  <header class="app-header" id="appHeader">
-    <div class="header-container">
-      <div class="brand-identity" data-link="home">
-        <span class="brand-dot"></span>
-        <span class="brand-text">ADDIS<span>ACTIVE</span></span>
-      </div>
+  <!-- Offline / Online Status Banner -->
+  <div id="offlineBanner" class="offline-banner" style="display:none;">
+    <span>⚡ Offline Mode Active — Local routes and tracking work normally. Cloud sync unavailable.</span>
+  </div>
 
+  <!-- App Header / Top Nav -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-box" data-link="home" style="cursor:pointer;">
+        <span class="brand-logo">⚡</span>
+        <div>
+          <h1 class="brand-name">ADDIS ACTIVE</h1>
+          <span class="brand-badge">BETA v1.0</span>
+        </div>
+      </div>
       <div class="header-actions">
-        <button class="icon-btn search-trigger" id="searchTrigger" aria-label="Search Addis Active">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        </button>
-        <button class="icon-btn profile-trigger" data-link="profile" aria-label="My Profile">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </button>
+        <button id="searchTrigger" class="icon-btn" aria-label="Search">🔍</button>
+        <button class="icon-btn" data-link="profile" aria-label="Profile">👤</button>
       </div>
     </div>
   </header>
 
-  <main class="app-main" id="appMain"></main>
+  <!-- Main Viewport Shell -->
+  <main id="appMain" class="app-main">
+    <!-- Dynamic Views Render Here -->
+  </main>
 
-  <div class="modal-overlay" id="searchModal" aria-hidden="true">
-    <div class="search-modal-card">
-      <div class="search-input-wrap">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input type="text" id="globalSearchInput" placeholder="Search routes, events, communities, places..." autofocus />
-        <button class="search-close" id="searchClose">&times;</button>
+  <!-- Global Search Modal -->
+  <div id="searchModal" class="search-modal">
+    <div class="search-modal-content">
+      <div class="search-bar-header">
+        <input type="text" id="globalSearchInput" placeholder="Search routes, events, communities..." autocomplete="off">
+        <button id="searchClose" class="btn-close">✕</button>
       </div>
-      <div class="search-results-container" id="searchResults">
+      <div id="searchResults" class="search-results-list">
         <p class="search-hint">Type anything to explore Addis Ababa...</p>
       </div>
     </div>
   </div>
 
-  <nav class="mobile-nav" id="mobileNav" aria-label="Bottom Navigation">
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-nav" aria-label="Bottom Navigation">
     <button class="nav-tab active" data-target="home">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span>Home</span>
+      <span class="nav-icon">🏠</span>
+      <span class="nav-text">Home</span>
     </button>
     <button class="nav-tab" data-target="explore">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-      <span>Explore</span>
+      <span class="nav-icon">🗺️</span>
+      <span class="nav-text">Explore</span>
     </button>
     <button class="nav-tab" data-target="activity">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      <span>Activity</span>
+      <span class="nav-icon">⚡</span>
+      <span class="nav-text">Track</span>
     </button>
     <button class="nav-tab" data-target="events">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <span>Events</span>
+      <span class="nav-icon">📅</span>
+      <span class="nav-text">Events</span>
     </button>
     <button class="nav-tab" data-target="profile">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span>Profile</span>
+      <span class="nav-icon">👤</span>
+      <span class="nav-text">Journey</span>
     </button>
   </nav>
 
-  <div class="offline-banner" id="offlineBanner" style="display: none;">
-    <span>⚡ YOU'RE OFFLINE — Cached routes & local progress available.</span>
-  </div>
-
-  <script src="app.js"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- Main Application Script -->
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
