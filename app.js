@@ -3,7 +3,6 @@ import { DB } from './data/db.js';
 class AddisActiveApp {
   constructor() {
     this.currentView = 'home';
-    this.activeActivity = null;
     this.watchId = null;
     this.startTime = null;
     this.timerInterval = null;
@@ -38,9 +37,8 @@ class AddisActiveApp {
 
   setupEventListeners() {
     document.querySelectorAll('.nav-tab').forEach(tab => {
-      tab.addEventListener('click', (e) => {
-        const target = tab.getAttribute('data-target');
-        this.renderView(target);
+      tab.addEventListener('click', () => {
+        this.renderView(tab.getAttribute('data-target'));
       });
     });
 
@@ -94,7 +92,6 @@ class AddisActiveApp {
         break;
       case 'videos':
         main.innerHTML = this.getVideosHTML();
-        this.bindVideoEvents();
         break;
       case 'activity':
         main.innerHTML = this.getActivityTrackerHTML();
@@ -102,7 +99,6 @@ class AddisActiveApp {
         break;
       case 'events':
         main.innerHTML = this.getEventsHTML();
-        this.bindEventEvents();
         break;
       case 'profile':
         main.innerHTML = this.getProfileHTML();
@@ -132,15 +128,14 @@ class AddisActiveApp {
         </div>
 
         <div class="card">
-          <span class="section-subtitle">Personalized Feed</span>
-          <h3 class="section-title">Recommended for You</h3>
-          <p class="section-desc">Tailored based on your preference for ${profile.primaryActivity} sessions.</p>
-          <div style="display:flex; flex-direction:column; gap:0.75rem;">
-            ${DB.routes.map(r => `
-              <div style="background:#181818; padding:1rem; border-radius:8px; border:1px solid #222;">
-                <span class="badge">${r.activity} •${r.area}</span>
-                <h4 style="font-family:var(--font-display); font-size:1.1rem; margin:0.3rem 0;">${r.name}</h4>
-                <p style="font-size:0.850rem; color:var(--text-muted);">📏 ${r.distance} \vert{} ⚡${r.elevation}</p>
+          <span class="section-subtitle">AI Addis Coach</span>
+          <h3 class="section-title">Ask Your Trainer</h3>
+          <p class="section-desc">Tap a question below for instant localized guidance on altitude and pacing.</p>
+          <div style="display:flex; flex-direction:column; gap:0.5rem;" id="aiCoachBox">
+            ${DB.aiCoachPrompts.map((p, idx) => `
+              <div class="ai-prompt-card" data-idx="${idx}" style="background:#181818; padding:0.75rem 1rem; border-radius:8px; border:1px solid #222; cursor:pointer;">
+                <div style="font-size:0.9rem; font-weight:600; color:var(--accent-lime);">💡 ${p.q}</div>
+                <div class="ai-ans" style="display:none; font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem; border-top:1px solid #333; padding-top:0.5rem;">${p.a}</div>
               </div>
             `).join('')}
           </div>
@@ -152,6 +147,15 @@ class AddisActiveApp {
   bindHomeEvents() {
     document.getElementById('heroExploreBtn')?.addEventListener('click', () => this.renderView('explore'));
     document.getElementById('heroTrackBtn')?.addEventListener('click', () => this.renderView('activity'));
+    
+    document.querySelectorAll('.ai-prompt-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const ans = card.querySelector('.ai-ans');
+        if (ans) {
+          ans.style.display = ans.style.display === 'block' ? 'none' : 'block';
+        }
+      });
+    });
   }
 
   getExploreHTML(filter) {
@@ -166,7 +170,6 @@ class AddisActiveApp {
           <button class="filter-chip ${filter === 'all' ? 'active':''}" data-filter="all">All</button>
           <button class="filter-chip ${filter === 'run' ? 'active':''}" data-filter="run">Run</button>
           <button class="filter-chip ${filter === 'hike' ? 'active':''}" data-filter="hike">Hike</button>
-          <button class="filter-chip ${filter === 'walk' ? 'active':''}" data-filter="walk">Walk</button>
         </div>
 
         <div id="mapContainer"></div>
@@ -206,8 +209,6 @@ class AddisActiveApp {
           maxZoom: 19,
           attribution: '© OpenStreetMap'
         }).addTo(map);
-        L.marker([9.0192, 38.7890]).addTo(map).bindPopup('<b>Bole Loop</b>');
-        L.marker([9.0765, 38.7421]).addTo(map).bindPopup('<b>Entoto Ridge</b>');
       }
     }, 150);
   }
@@ -217,22 +218,16 @@ class AddisActiveApp {
       <div class="view-section active">
         <span class="section-subtitle">Video-First Discovery</span>
         <h3 class="section-title">Addis Visual Feed</h3>
-        <p class="section-desc">“Watch before you go” — Preview routes, parks, and active corridors across Addis Ababa.</p>
-        
+        <p class="section-desc">“Watch before you go” — Preview routes and parks.</p>
         <div style="display:flex; flex-direction:column; gap:1.25rem;">
           ${DB.videos.map(v => `
             <div class="card" style="margin-bottom:0; padding:0; overflow:hidden;">
               <div style="position:relative; background:#000; height:180px;">
                 <img src="${v.thumbnail}" alt="${v.title}" style="width:100%; height:100%; object-fit:cover; opacity:0.8;">
-                <div style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.8); padding:2px 8px; border-radius:4px; font-family:var(--font-tech); font-size:0.7rem; color:var(--accent-lime);">
-                  ⏱️ ${v.duration}
-                </div>
               </div>
               <div style="padding:1rem;">
-                <span class="badge">${v.area}</span>
-                <h4 style="font-family:var(--font-display); font-size:1.1rem; margin:0.4rem 0;">${v.title}</h4>
-                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">${v.desc}</p>
-                <button class="btn btn-outline btn-full btn-sm" onclick="alert('Playing video walkthrough: ${v.title}')">▶ Watch Walkthrough</button>
+                <span class="badge">${v.title}</span>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.4rem;">${v.desc}</p>
               </div>
             </div>
           `).join('')}
@@ -241,15 +236,12 @@ class AddisActiveApp {
     `;
   }
 
-  bindVideoEvents() {}
-
   getActivityTrackerHTML() {
     return `
       <div class="view-section active">
         <span class="section-subtitle">Live GPS Engine</span>
         <h3 class="section-title">Activity Tracker</h3>
-        <p class="section-desc">Track runs, walks, hikes, and rides locally with zero data transmission.</p>
-
+        <p class="section-desc">Track runs and walks locally with zero data transmission.</p>
         <div class="tracker-card">
           <div id="timerDisplay" class="timer-display">00:00:00</div>
           <div class="metrics-row">
@@ -269,7 +261,6 @@ class AddisActiveApp {
           <div id="trackerMap" style="height:200px; width:100%; border-radius:8px; margin-bottom:1rem; background:#111;"></div>
           <div style="display:flex; gap:0.5rem;">
             <button id="startTrackBtn" class="btn btn-primary btn-full">Start Session</button>
-            <button id="pauseTrackBtn" class="btn btn-outline" style="display:none;">Pause</button>
             <button id="stopTrackBtn" class="btn btn-outline" style="display:none; color:var(--danger-red); border-color:var(--danger-red);">Finish</button>
           </div>
         </div>
@@ -279,19 +270,17 @@ class AddisActiveApp {
 
   bindTrackerEvents() {
     const startBtn = document.getElementById('startTrackBtn');
-    const pauseBtn = document.getElementById('pauseTrackBtn');
     const stopBtn = document.getElementById('stopTrackBtn');
 
     startBtn?.addEventListener('click', () => {
       startBtn.style.display = 'none';
-      if (pauseBtn) pauseBtn.style.display = 'block';
       if (stopBtn) stopBtn.style.display = 'block';
       this.startGPSession();
     });
 
     stopBtn?.addEventListener('click', () => {
       this.stopGPSession();
-      alert('Activity completed and saved locally to My Journey!');
+      alert('Activity completed and goal progress updated!');
       this.renderView('profile');
     });
 
@@ -310,74 +299,53 @@ class AddisActiveApp {
     this.startTime = Date.now();
     this.distance = 0;
     this.routeCoordinates = [];
-    
-    document.getElementById('gpsStatus').innerText = 'Searching';
+    document.getElementById('gpsStatus').innerText = 'Active';
 
     if ('geolocation' in navigator) {
-      this.watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          const { latitude, longitude, accuracy } = position.coords;
-          if (accuracy > 30) return;
-
-          document.getElementById('gpsStatus').innerText = 'Active';
-          const newPoint = [latitude, longitude];
-
-          if (this.lastCoords) {
-            const distIncrement = this.calculateHaversine(this.lastCoords[0], this.lastCoords[1], latitude, longitude);
-            if (distIncrement > 0.002) {
-              this.distance += distIncrement;
-              document.getElementById('distDisplay').innerText = this.distance.toFixed(2);
-            }
+      this.watchId = navigator.geolocation.watchPosition((pos) => {
+        const { latitude, longitude, accuracy } = pos.coords;
+        if (accuracy > 30) return;
+        const pt = [latitude, longitude];
+        if (this.lastCoords) {
+          const d = this.calcHaversine(this.lastCoords[0], this.lastCoords[1], latitude, longitude);
+          if (d > 0.002) {
+            this.distance += d;
+            document.getElementById('distDisplay').innerText = this.distance.toFixed(2);
           }
-          this.lastCoords = newPoint;
-          this.routeCoordinates.push(newPoint);
-
-          if (this.mapInstance) {
-            this.mapInstance.setView(newPoint, 15);
-            if (!this.polylineInstance) {
-              this.polylineInstance = L.polyline(this.routeCoordinates, { color: '#CCFF00', weight: 4 }).addTo(this.mapInstance);
-            } else {
-              this.polylineInstance.setLatLngs(this.routeCoordinates);
-            }
+        }
+        this.lastCoords = pt;
+        this.routeCoordinates.push(pt);
+        if (this.mapInstance) {
+          this.mapInstance.setView(pt, 15);
+          if (!this.polylineInstance) {
+            this.polylineInstance = L.polyline(this.routeCoordinates, { color: '#CCFF00', weight: 4 }).addTo(this.mapInstance);
+          } else {
+            this.polylineInstance.setLatLngs(this.routeCoordinates);
           }
-        },
-        (error) => {
-          document.getElementById('gpsStatus').innerText = 'Denied/Error';
-        },
-        { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
-      );
-    } else {
-      document.getElementById('gpsStatus').innerText = 'Unsupported';
+        }
+      }, () => {}, { enableHighAccuracy: true });
     }
 
     this.timerInterval = setInterval(() => {
-      const elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
-      const mins = Math.floor(elapsedSeconds / 60).toString().padStart(2, '0');
-      const secs = (elapsedSeconds % 60).toString().padStart(2, '0');
-      const hours = Math.floor(elapsedSeconds / 3600).toString().padStart(2, '0');
-      document.getElementById('timerDisplay').innerText = `${hours}:${mins}:${secs}`;
+      const s = Math.floor((Date.now() - this.startTime) / 1000);
+      const m = Math.floor(s / 60).toString().padStart(2, '0');
+      const sec = (s % 60).toString().padStart(2, '0');
+      const h = Math.floor(s / 3600).toString().padStart(2, '0');
+      document.getElementById('timerDisplay').innerText = `${h}:${m}:${sec}`;
     }, 1000);
   }
 
   stopGPSession() {
-    if (this.watchId !== null) {
-      navigator.geolocation.clearWatch(this.watchId);
-      this.watchId = null;
-    }
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval);
-    }
+    if (this.watchId !== null) navigator.geolocation.clearWatch(this.watchId);
+    if (this.timerInterval) clearInterval(this.timerInterval);
   }
 
-  calculateHaversine(lat1, lon1, lat2, lon2) {
+  calcHaversine(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
   }
 
   getEventsHTML() {
@@ -385,7 +353,7 @@ class AddisActiveApp {
       <div class="view-section active">
         <span class="section-subtitle">Community Schedule</span>
         <h3 class="section-title">Events & Meetups</h3>
-        <p class="section-desc">Join verified group runs and outdoor community sessions.</p>
+        <p class="section-desc">Join verified group runs across Addis Ababa.</p>
         <div style="display:flex; flex-direction:column; gap:1rem;">
           ${DB.events.map(ev => `
             <div class="card" style="margin-bottom:0;">
@@ -393,7 +361,7 @@ class AddisActiveApp {
               <h4 style="font-family:var(--font-display); font-size:1.15rem; margin:0.4rem 0;">${ev.title}</h4>
               <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">${ev.description}</p>
               <div style="font-size:0.8rem; font-family:var(--font-tech); color:var(--accent-lime); margin-bottom:1rem;">📅 ${ev.date} at${ev.startTime}</div>
-              <button class="btn btn-primary btn-full btn-sm" onclick="alert('Successfully registered for ${ev.title}!')">Register for Event</button>
+              <button class="btn btn-primary btn-full btn-sm" onclick="alert('Successfully registered!')">Register for Event</button>
             </div>
           `).join('')}
         </div>
@@ -401,37 +369,34 @@ class AddisActiveApp {
     `;
   }
 
-  bindEventEvents() {}
-
   getProfileHTML() {
     const profile = DB.userProfile;
     return `
       <div class="view-section active">
-        <span class="section-subtitle">My Journey & Cloud Sync</span>
+        <span class="section-subtitle">My Journey & Goals</span>
         <h3 class="section-title">${profile.username}'s Dashboard</h3>
-        <p class="section-desc">Cloud-synced profile, personal preferences, and unlocked achievements.</p>
+        <p class="section-desc">Active fitness targets and territory progression.</p>
 
         <div class="card" style="border-color:var(--accent-lime);">
-          <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">⚙️ Personalization Settings</h4>
-          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Customize your Addis Active experience.</p>
-          <div style="display:flex; flex-direction:column; gap:0.75rem; font-size:0.85rem;">
-            <div style="display:flex; justify-content:space-between; background:#181818; padding:0.75rem; border-radius:6px;">
-              <span style="color:var(--text-muted);">Primary Activity</span>
-              <span style="font-family:var(--font-tech); color:var(--accent-lime); text-transform:uppercase;">${profile.primaryActivity}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; background:#181818; padding:0.75rem; border-radius:6px;">
-              <span style="color:var(--text-muted);">Fitness Level</span>
-              <span style="font-family:var(--font-tech); color:var(--text-primary);">${profile.fitnessLevel}</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; background:#181818; padding:0.75rem; border-radius:6px;">
-              <span style="color:var(--text-muted);">Cloud Sync Status</span>
-              <span style="font-family:var(--font-tech); color:var(--accent-lime);">Connected (Local Supabase Mock)</span>
-            </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <h4 style="font-family:var(--font-display); font-size:1.1rem;">🎯 Personal Goals</h4>
+            <button class="btn btn-primary btn-sm" id="addGoalBtn">+ Add Goal</button>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:0.75rem;" id="goalsListContainer">
+            ${profile.activeGoals.map(g => `
+              <div style="background:#181818; padding:0.85rem; border-radius:8px; border:1px solid #222;">
+                <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.9rem; margin-bottom:0.3rem;">
+                  <span>${g.title}</span>
+                  <span style="font-family:var(--font-tech); color:var(--accent-lime);">${g.progress} /${g.target}</span>
+                </div>
+                <div style="font-family:var(--font-tech); font-size:0.65rem; color:var(--text-dim);">${g.status}</div>
+              </div>
+            `).join('')}
           </div>
         </div>
 
         <div class="card">
-          <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">Territory Stamps & Exploration</h4>
+          <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">Territory Stamps</h4>
           <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:0.75rem; margin-top:0.75rem;">
             ${DB.territories.map(t => `
               <div style="background:#181818; border:1px solid ${t.status === 'UNLOCKED' ? 'var(--accent-lime)' : 'var(--border-color)'}; padding:0.75rem; border-radius:8px;">
@@ -442,51 +407,31 @@ class AddisActiveApp {
             `).join('')}
           </div>
         </div>
-
-        <div class="card">
-          <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">Badges & Achievements</h4>
-          <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.75rem;">
-            ${DB.badges.map(b => `
-              <div style="background:#181818; border:1px solid ${b.unlocked ? 'var(--accent-lime)' : 'var(--border-color)'}; padding:0.5rem 0.75rem; border-radius:6px; font-size:0.8rem; display:flex; align-items:center; gap:6px;">
-                <span>${b.icon}</span>
-                <span>${b.name}</span>
-              </div>
-            `).join('')}
-          </div>
-        </div>
       </div>
     `;
   }
 
-  bindProfileEvents() {}
+  bindProfileEvents() {
+    document.getElementById('addGoalBtn')?.addEventListener('click', () => {
+      const title = prompt('Enter new goal title (e.g., Weekend Morning Run):');
+      if (title) {
+        DB.userProfile.activeGoals.push({ id: 'g' + Date.now(), title, target: '10 KM', progress: '0 KM', status: 'In Progress' });
+        this.renderView('profile');
+      }
+    });
+  }
 
   handleGlobalSearch(query) {
-    const resultsContainer = document.getElementById('searchResults');
-    if (!resultsContainer) return;
+    const res = document.getElementById('searchResults');
+    if (!res) return;
     if (!query.trim()) {
-      resultsContainer.innerHTML = '<p class="search-hint">Type anything to explore Addis Ababa...</p>';
+      res.innerHTML = '<p class="search-hint">Type anything to explore Addis Ababa...</p>';
       return;
     }
-
     const q = query.toLowerCase();
-    const matchedRoutes = DB.routes.filter(r => r.name.toLowerCase().includes(q) || r.area.toLowerCase().includes(q));
-    const matchedEvents = DB.events.filter(e => e.title.toLowerCase().includes(q));
-
-    let html = '';
-    if (matchedRoutes.length === 0 && matchedEvents.length === 0) {
-      html = '<p class="search-hint">No results found in Addis Active.</p>';
-    } else {
-      matchedRoutes.forEach(r => {
-        html += `<div class="search-result-item" onclick="alert('Selected route: ${r.name}')"><strong>Route:</strong> ${r.name} (${r.area})</div>`;
-      });
-      matchedEvents.forEach(e => {
-        html += `<div class="search-result-item" onclick="alert('Selected event: ${e.title}')"><strong>Event:</strong> ${e.title}</div>`;
-      });
-    }
-    resultsContainer.innerHTML = html;
+    const matches = DB.routes.filter(r => r.name.toLowerCase().includes(q));
+    res.innerHTML = matches.length ? matches.map(r => `<div class="search-result-item" onclick="alert('${r.name}')">${r.name}</div>`).join('') : '<p class="search-hint">No results found.</p>';
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  window.app = new AddisActiveApp();
-});
+document.addEventListener('DOMContentLoaded', () => { window.app = new AddisActiveApp(); });
