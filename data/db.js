@@ -59,7 +59,7 @@ export const DB = {
       duration: '3:45',
       thumbnail: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80',
       embedUrl: 'https://www.youtube.com/embed/K5-GKrUrInI',
-      desc: '[DEMO] Visual preview of the high-altitude eucalyptus trails and panoramic city viewpoints[span_0](start_span)[span_0](end_span).'
+      desc: '[DEMO] Visual preview of the high-altitude eucalyptus trails and panoramic city viewpoints.'
     },
     {
       id: 'v2',
@@ -68,7 +68,7 @@ export const DB = {
       duration: '2:30',
       thumbnail: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80',
       embedUrl: 'https://www.youtube.com/embed/placeholder',
-      desc: '[DEMO] Smooth sidewalks and early morning running conditions across the Bole commercial corridor[span_1](start_span)[span_1](end_span).'
+      desc: '[DEMO] Smooth sidewalks and early morning running conditions across the Bole commercial corridor.'
     }
   ],
   communities: [
@@ -107,8 +107,10 @@ export const DB = {
     { id: 'b2', name: 'FIRST 5K', icon: '🏃', desc: 'Complete a 5K session.', unlocked: false }
   ],
   territories: [
-    { id: 't1', name: 'Bole & Airport Zone', status: 'EXPLORED', routesCount: 3 },
-    { id: 't2', name: 'Entoto Mountain Range', status: 'UNEXPLORED', routesCount: 5 }
+    { id: 't1', name: 'Bole & Airport Zone', status: 'UNLOCKED', icon: '✈️', desc: 'Urban tarmac corridors and commercial running zones.', routesCount: 3 },
+    { id: 't2', name: 'Entoto Mountain Range', status: 'LOCKED', icon: '🌲', desc: 'High-altitude eucalyptus forests and ridge trails.', routesCount: 5 },
+    { id: 't3', name: 'Meskel Square & Stadium Hub', status: 'LOCKED', icon: '🏟️', desc: 'The historic heart of Ethiopian running culture.', routesCount: 2 },
+    { id: 't4', name: 'Sidist Kilo & University Zone', status: 'LOCKED', icon: '🏛️', desc: 'Historic streets and campus green spaces.', routesCount: 4 }
   ],
   impactMetrics: {
     routesAvailable: 12,
