@@ -216,7 +216,7 @@ class AddisActiveApp {
       <div class="view-section active">
         <span class="section-subtitle">Video-First Discovery</span>
         <h3 class="section-title">Addis Visual Feed</h3>
-        <p class="section-desc">“Watch before you go” — Preview routes, parks, and active corridors across Addis Ababa[span_2](start_span)[span_2](end_span).</p>
+        <p class="section-desc">“Watch before you go” — Preview routes, parks, and active corridors across Addis Ababa.</p>
         
         <div style="display:flex; flex-direction:column; gap:1.25rem;">
           ${DB.videos.map(v => `
@@ -407,7 +407,21 @@ class AddisActiveApp {
       <div class="view-section active">
         <span class="section-subtitle">My Journey</span>
         <h3 class="section-title">Activity Dashboard</h3>
-        <p class="section-desc">Your local history, goals, and unlocked badges.</p>
+        <p class="section-desc">Your local history, goals, territory stamps, and unlocked badges.</p>
+
+        <div class="card">
+          <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">Territory Stamps & Exploration</h4>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">Collect stamps by exploring city districts.</p>
+          <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:0.75rem; margin-top:0.75rem;">
+            ${DB.territories.map(t => `
+              <div style="background:#181818; border:1px solid ${t.status === 'UNLOCKED' ? 'var(--accent-lime)' : 'var(--border-color)'}; padding:0.75rem; border-radius:8px;">
+                <div style="font-size:1.5rem; margin-bottom:0.2rem;">${t.icon}</div>
+                <div style="font-family:var(--font-display); font-size:0.9rem; font-weight:700;">${t.name}</div>
+                <div style="font-family:var(--font-tech); font-size:0.65rem; color:${t.status === 'UNLOCKED' ? 'var(--accent-lime)' : 'var(--text-dim)'}; margin-top:0.2rem;">${t.status}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
 
         <div class="card">
           <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">Badges & Achievements</h4>
