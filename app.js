@@ -8,27 +8,8 @@ class AddisActiveApp {
   }
 
   init() {
-    // Force remove splash screen immediately
-    const splash = document.getElementById('splashScreen');
-    if (splash) {
-      splash.style.opacity = '0';
-      setTimeout(() => splash.remove(), 300);
-    }
-
     this.setupEventListeners();
-    this.checkUserOnboarding();
-  }
-
-  checkUserOnboarding() {
-    const saved = localStorage.getItem('addis_active_profile');
-    if (saved) {
-      DB.userProfile = JSON.parse(saved);
-      this.renderView('home');
-    } else {
-      const modal = document.getElementById('onboardingModal');
-      if (modal) modal.style.display = 'flex';
-      this.renderView('home');
-    }
+    this.renderView('home');
   }
 
   setupEventListeners() {
@@ -55,27 +36,9 @@ class AddisActiveApp {
     if (searchClose && searchModal) searchClose.addEventListener('click', () => searchModal.classList.remove('active'));
     if (searchInput) searchInput.addEventListener('input', (e) => this.handleGlobalSearch(e.target.value));
 
-    const onboardingForm = document.getElementById('onboardingForm');
-    onboardingForm?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const username = document.getElementById('setupName').value;
-      const primaryActivity = document.getElementById('setupActivity').value;
-      const homeArea = document.getElementById('setupArea').value;
-      const fitnessLevel = document.getElementById('setupLevel').value;
-
-      DB.userProfile = {
-        username,
-        primaryActivity,
-        homeArea,
-        fitnessLevel,
-        activeGoals: [
-          { id: 'g1', title: `First ${primaryActivity.toUpperCase()} Session`, target: '5 KM', progress: '0 KM', status: 'In Progress' }
-        ]
-      };
-
-      localStorage.setItem('addis_active_profile', JSON.stringify(DB.userProfile));
-      document.getElementById('onboardingModal').style.display = 'none';
-      this.renderView('home');
+    const detailModal = document.getElementById('detailModal');
+    detailModal?.addEventListener('click', (e) => {
+      if (e.target === detailModal) detailModal.classList.remove('active');
     });
   }
 
@@ -102,14 +65,8 @@ class AddisActiveApp {
     }
   }
 
-  getSortedRoutes() {
-    return [...DB.routes];
-  }
-
   getHomeHTML() {
-    const profile = DB.userProfile || { username: 'Athlete', homeArea: 'Bole', primaryActivity: 'run' };
-    const sortedRoutes = this.getSortedRoutes().slice(0, 4);
-
+    const profile = DB.userProfile;
     return `
       <div class="view-section active">
         <div class="hero-box">
@@ -127,13 +84,14 @@ class AddisActiveApp {
           <span class="section-subtitle">Proximity Engine</span>
           <h3 class="section-title">Nearest to You</h3>
           <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.75rem;">
-            ${sortedRoutes.map(r => `
-              <div style="background:#181818; padding:1rem; border-radius:10px; border:1px solid #222; display:flex; justify-content:space-between; align-items:center;">
+            ${DB.routes.slice(0, 4).map(r => `
+              <div style="background:#181818; padding:1rem; border-radius:10px; border:1px solid #222; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="window.app.showRouteDetails('${r.id}')">
                 <div>
                   <span class="badge">${r.activity} •${r.area}</span>
                   <h4 style="font-family:var(--font-display); font-size:1.05rem; margin:0.3rem 0;">${r.name}</h4>
                   <p style="font-size:0.8rem; color:var(--text-muted);">📏 ${r.distance} \vert{} ⚡${r.elevation}</p>
                 </div>
+                <button class="btn btn-outline btn-sm">View</button>
               </div>
             `).join('')}
           </div>
@@ -167,11 +125,14 @@ class AddisActiveApp {
 
         <div class="grid-2" style="margin-top:1rem;">
           ${routes.map(r => `
-            <div class="card" style="margin-bottom:0;">
-              <span class="badge">${r.activity} •${r.area}</span>
-              <h4 style="font-family:var(--font-display); font-size:1.1rem; margin:0.4rem 0;">${r.name}</h4>
-              <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">${r.desc}</p>
-              <div style="font-size:0.75rem; color:var(--accent-lime); font-family:var(--font-tech);">📏 ${r.distance} \vert{} ⚡${r.elevation}</div>
+            <div class="card" style="margin-bottom:0; display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <span class="badge">${r.activity} •${r.area}</span>
+                <h4 style="font-family:var(--font-display); font-size:1.1rem; margin:0.4rem 0;">${r.name}</h4>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">${r.desc}</p>
+                <div style="font-size:0.75rem; color:var(--accent-lime); font-family:var(--font-tech); margin-bottom:1rem;">📏 ${r.distance} \vert{} ⚡${r.elevation}</div>
+              </div>
+              <button class="btn btn-outline btn-full btn-sm" onclick="window.app.showRouteDetails('${r.id}')">View Details</button>
             </div>
           `).join('')}
         </div>
@@ -188,6 +149,38 @@ class AddisActiveApp {
         this.bindExploreEvents();
       });
     });
+  }
+
+  showRouteDetails(routeId) {
+    const r = DB.routes.find(x => x.id === routeId);
+    if (!r) return;
+    const modal = document.getElementById('detailModal');
+    const content = document.getElementById('detailModalContent');
+    if (!modal || !content) return;
+
+    content.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <span class="badge">${r.activity} • ${r.area}</span>
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('detailModal').classList.remove('active')">✕ Close</button>
+      </div>
+      <h3 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:0.5rem;">${r.name}</h3>
+      <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1rem;">${r.desc}</p>
+      
+      <div style="background:#181818; padding:1rem; border-radius:10px; margin-bottom:1rem; font-size:0.85rem; display:flex; flex-direction:column; gap:0.5rem;">
+        <div>📏 <strong>Distance:</strong> ${r.distance}</div>
+        <div>⚡ <strong>Elevation:</strong> ${r.elevation}</div>
+        <div>🧭 <strong>Surface:</strong> ${r.surface}</div>
+        <div>📍 <strong>Start Point:</strong> ${r.startingPoint}</div>
+      </div>
+
+      <h4 style="font-family:var(--font-display); font-size:1rem; margin-bottom:0.5rem;">Facilities & Amenities</h4>
+      <div style="display:flex; flex-direction:column; gap:0.4rem; font-size:0.85rem; margin-bottom:1.25rem;">
+        ${r.facilities.map(f => `<div style="background:#181818; padding:0.5rem 0.75rem; border-radius:8px; color:var(--text-muted);">✓ ${f}</div>`).join('')}
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="alert('Route saved!'); document.getElementById('detailModal').classList.remove('active');">⭐ Save Route</button>
+    `;
+    modal.classList.add('active');
   }
 
   getVideosHTML() {
@@ -236,7 +229,7 @@ class AddisActiveApp {
   }
 
   getProfileHTML() {
-    const profile = DB.userProfile || { username: 'Athlete', activeGoals: [] };
+    const profile = DB.userProfile;
     return `
       <div class="view-section active">
         <span class="section-subtitle">My Journey</span>
@@ -255,7 +248,6 @@ class AddisActiveApp {
       const target = prompt('Enter target (e.g., 10 KM):');
       if (title && target) {
         DB.userProfile.activeGoals.push({ title, target, progress: '0 KM', status: 'In Progress' });
-        localStorage.setItem('addis_active_profile', JSON.stringify(DB.userProfile));
         this.renderView('profile');
       }
     });
@@ -266,7 +258,7 @@ class AddisActiveApp {
     if (!res || !query.trim()) return;
     const q = query.toLowerCase();
     const matches = DB.routes.filter(r => r.name.toLowerCase().includes(q));
-    res.innerHTML = matches.length ? matches.map(r => `<div class="search-result-item"><strong>${r.name}</strong></div>`).join('') : '<p class="search-hint">No results.</p>';
+    res.innerHTML = matches.length ? matches.map(r => `<div class="search-result-item" onclick="document.getElementById('searchModal').classList.remove('active'); window.app.showRouteDetails('${r.id}');"><strong>${r.name}</strong></div>`).join('') : '<p class="search-hint">No results.</p>';
   }
 }
 
