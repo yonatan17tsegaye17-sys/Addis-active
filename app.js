@@ -121,6 +121,7 @@ class AddisActiveApp {
       case 'home': wrapper.innerHTML = this.getHomeHTML(); this.bindHomeEvents(); break;
       case 'explore': wrapper.innerHTML = this.getExploreHTML('all'); this.bindExploreEvents(); break;
       case 'activity': wrapper.innerHTML = this.getActivityTrackerHTML(); this.bindTrackerEvents(); break;
+      case 'community': wrapper.innerHTML = this.getCommunityHTML(); break;
       case 'profile': wrapper.innerHTML = this.getProfileHTML(); this.bindProfileEvents(); break;
       default: wrapper.innerHTML = this.getHomeHTML();
     }
@@ -151,20 +152,22 @@ class AddisActiveApp {
     const actMeta = DB.activitiesMeta[profile.primaryActivity] || DB.activitiesMeta['run'];
 
     return `
+      <!-- Addis Active Today Daily Snapshot (Part 2) -->
       <div class="hero-box">
         <div class="location-tag"><span class="brand-dot"></span><span>ADDIS ABABA • 2,355M ALTITUDE</span></div>
-        <h2 class="hero-title">${profile.username.toUpperCase()}</h2>
+        <h2 class="hero-title">GOOD MORNING, ${profile.username.toUpperCase()}</h2>
         <p class="hero-tagline">LVL ${profile.level} ATHLETE • ${profile.xp} XP</p>
         <p class="hero-desc">Engine tuned for ${actMeta.title} ${actMeta.icon} across Addis corridors.</p>
         <div class="hero-btns">
-          <button class="btn btn-primary" id="heroExploreBtn">Explore All Activities</button>
+          <button class="btn btn-primary" id="heroExploreBtn">Active Near Me</button>
           <button class="btn btn-outline" id="heroTrackBtn">Start GPS Session</button>
         </div>
       </div>
 
       <div class="card">
-        <span class="section-subtitle">Proximity Engine</span>
-        <h3 class="section-title">Nearest to You</h3>
+        <span class="section-subtitle">Addis Active Today</span>
+        <h3 class="section-title">📍 Nearest to You</h3>
+        <p class="section-desc">Sorted dynamically by your current GPS position.</p>
         <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.75rem;">
           ${sortedRoutes.map(r => `
             <div style="background:#181818; padding:1rem; border-radius:10px; border:1px solid #222; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="window.app.showRouteDetails('${r.id}')">
@@ -177,6 +180,14 @@ class AddisActiveApp {
             </div>
           `).join('')}
         </div>
+      </div>
+
+      <!-- Localized AI Coach (Pillar 8) -->
+      <div class="card">
+        <span class="section-subtitle">[DEMO] Localized AI Coach</span>
+        <h3 class="section-title">High-Altitude Guidance</h3>
+        <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:0.75rem;">“Running at 2,355m requires slower pacing initially. Reduce your usual tempo by 20–30 seconds per kilometer to allow cardiovascular adaptation.”</p>
+        <button class="btn btn-outline btn-sm" onclick="alert('AI Coach tip: Stay hydrated early and focus on nasal breathing during climbs!')">Ask Coach 💡</button>
       </div>
     `;
   }
@@ -191,7 +202,7 @@ class AddisActiveApp {
     const routes = filter === 'all' ? allRoutes : allRoutes.filter(r => r.activity === filter);
 
     return `
-      <span class="section-subtitle">Multi-Activity & Video Feed</span>
+      <span class="section-subtitle">Multi-Activity & Video Discovery</span>
       <h3 class="section-title">Explore 23+ Addis Locations</h3>
       <p class="section-desc">Filter by running, walking, cycling, swimming, hiking, football, or fitness.</p>
       
@@ -211,7 +222,7 @@ class AddisActiveApp {
           <div class="card" style="margin-bottom:0; display:flex; flex-direction:column; justify-content:space-between;">
             <div>
               <div style="background:#1a1a1a; padding:0.75rem; border-radius:8px; border:1px solid #282828; margin-bottom:0.75rem; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:0.85rem; font-weight:600;">📺 Watch: ${r.videoTitle}</span>
+                <span style="font-size:0.85rem; font-weight:600;">📺 Watch Before You Go: ${r.videoTitle}</span>
                 <span class="badge">⏱️ ${r.videoDuration}</span>
               </div>
               <span class="badge">${DB.activitiesMeta[r.activity]?.icon || '📍'} ${r.activity.toUpperCase()} •${r.area}</span>
@@ -375,12 +386,31 @@ class AddisActiveApp {
     if (this.timerInterval) clearInterval(this.timerInterval);
   }
 
+  getCommunityHTML() {
+    return `
+      <span class="section-subtitle">Community Network</span>
+      <h3 class="section-title">Active Addis Communities</h3>
+      <p class="section-desc">Connect with running clubs, cycling networks, and walking groups.</p>
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+        ${DB.communities.map(c => `
+          <div class="card">
+            <span class="badge">${c.type} •${c.area}</span>
+            <h4 style="font-family:var(--font-display); font-size:1.15rem; margin:0.4rem 0;">${c.name}</h4>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">${c.desc}</p>
+            <div style="font-size:0.8rem; font-family:var(--font-tech); color:var(--accent-lime); margin-bottom:1rem;">📅 ${c.schedule} \vert{} 📍 ${c.meetingPoint}</div>
+            <button class="btn btn-primary btn-full btn-sm" onclick="alert('Successfully connected with ${c.name}!')">Join Community Layer</button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
   getProfileHTML() {
     const profile = DB.userProfile || { username: 'Athlete', xp: 50, level: 1, activeGoals: [] };
     const xpPercent = Math.min(100, (profile.xp / 150) * 100);
 
     return `
-      <span class="section-subtitle">Gamification & Progression</span>
+      <span class="section-subtitle">My Journey & Gamification</span>
       <h3 class="section-title">${profile.username}'s Dashboard</h3>
       <p class="section-desc">Level ${profile.level} Athlete • ${profile.xp} / 150 XP to Next Level</p>
 
@@ -413,14 +443,14 @@ class AddisActiveApp {
       </div>
 
       <div class="card">
-        <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">Territory Conquering</h4>
+        <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">Territory Exploration</h4>
         <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:0.75rem; margin-top:0.75rem;">
           ${DB.territories.map(t => `
             <div style="background:#181818; border:1px solid ${profile.xp >= t.xpRequired ? 'var(--accent-lime)' : 'var(--border-color)'}; padding:0.75rem; border-radius:10px;">
               <div style="font-size:1.5rem; margin-bottom:0.2rem;">${t.icon}</div>
               <div style="font-family:var(--font-display); font-size:0.9rem; font-weight:700;">${t.name}</div>
               <div style="font-family:var(--font-tech); font-size:0.65rem; color:${profile.xp >= t.xpRequired ? 'var(--accent-lime)' : 'var(--text-dim)'}; margin-top:0.2rem;">
-                ${profile.xp >= t.xpRequired ? 'UNLOCKED ⚡' : `NEEDS ${t.xpRequired} XP`}
+                ${profile.xp >= t.xpRequired ? 'EXPLORED ⚡' : `NEEDS ${t.xpRequired} XP`}
               </div>
             </div>
           `).join('')}
