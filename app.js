@@ -94,27 +94,10 @@ class AddisActiveApp {
     detailModal?.addEventListener('click', (e) => {
       if (e.target === detailModal) detailModal.classList.remove('active');
     });
-
-    // Global delegation for explore details & filters so they never unbind
-    document.addEventListener('click', (e) => {
-      if (e.target.classList.contains('route-detail-btn')) {
-        const id = e.target.getAttribute('data-id');
-        this.showRouteDetails(id);
-      }
-      if (e.target.classList.contains('filter-chip')) {
-        const filter = e.target.getAttribute('data-filter');
-        this.currentExploreFilter = filter;
-        const main = document.getElementById('appMain');
-        if (main) {
-          const wrapper = main.querySelector('.view-section');
-          if (wrapper) wrapper.innerHTML = this.getExploreHTML(filter);
-        }
-      }
-    });
   }
 
   renderView(viewName) {
-    if (!DB.userProfile && viewName !== 'profile') {
+    if (!DB.userProfile && viewName !== 'profile' && viewName !== 'gov') {
       const modal = document.getElementById('onboardingModal');
       if (modal) modal.style.display = 'flex';
       return;
@@ -137,10 +120,11 @@ class AddisActiveApp {
 
     switch(viewName) {
       case 'home': wrapper.innerHTML = this.getHomeHTML(); this.bindHomeEvents(); break;
-      case 'explore': wrapper.innerHTML = this.getExploreHTML(this.currentExploreFilter); break;
+      case 'explore': wrapper.innerHTML = this.getExploreHTML(this.currentExploreFilter); this.bindExploreEvents(); break;
       case 'activity': wrapper.innerHTML = this.getActivityTrackerHTML(); this.bindTrackerEvents(); break;
       case 'community': wrapper.innerHTML = this.getCommunityHTML(); break;
       case 'profile': wrapper.innerHTML = this.getProfileHTML(); this.bindProfileEvents(); break;
+      case 'gov': wrapper.innerHTML = this.getGovernmentDashboardHTML(); break;
       default: wrapper.innerHTML = this.getHomeHTML();
     }
 
@@ -178,6 +162,7 @@ class AddisActiveApp {
         <div class="hero-btns">
           <button class="btn btn-primary" id="heroExploreBtn">Active Near Me</button>
           <button class="btn btn-outline" id="heroTrackBtn">Start GPS Session</button>
+          <button class="btn btn-outline" onclick="window.app.renderView('gov')" style="border-color:var(--accent-lime); color:var(--accent-lime);">🏛️ City Pulse (Gov)</button>
         </div>
       </div>
 
@@ -203,19 +188,15 @@ class AddisActiveApp {
           `).join('')}
         </div>
       </div>
-
-      <div class="card">
-        <span class="section-subtitle">[DEMO] Localized AI Coach</span>
-        <h3 class="section-title">High-Altitude Guidance</h3>
-        <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:0.75rem;">“Running at 2,355m requires slower pacing initially. Reduce your usual tempo by 20–30 seconds per kilometer to allow cardiovascular adaptation.”</p>
-        <button class="btn btn-outline btn-sm" onclick="alert('AI Coach tip: Stay hydrated early and focus on nasal breathing during climbs!')">Ask Coach 💡</button>
-      </div>
     `;
   }
 
   bindHomeEvents() {
     document.getElementById('heroExploreBtn')?.addEventListener('click', () => this.renderView('explore'));
     document.getElementById('heroTrackBtn')?.addEventListener('click', () => this.renderView('activity'));
+    document.querySelectorAll('.route-detail-btn').forEach(btn => {
+      btn.addEventListener('click', () => { this.showRouteDetails(btn.getAttribute('data-id')); });
+    });
   }
 
   getExploreHTML(filter) {
@@ -257,6 +238,24 @@ class AddisActiveApp {
         `).join('')}
       </div>
     `;
+  }
+
+  bindExploreEvents() {
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        const filter = e.target.getAttribute('data-filter');
+        const main = document.getElementById('appMain');
+        if (main) {
+          const wrapper = main.querySelector('.view-section');
+          if (wrapper) wrapper.innerHTML = this.getExploreHTML(filter);
+          this.bindExploreEvents();
+        }
+      });
+    });
+
+    document.querySelectorAll('.route-detail-btn').forEach(btn => {
+      btn.addEventListener('click', () => { this.showRouteDetails(btn.getAttribute('data-id')); });
+    });
   }
 
   showRouteDetails(routeId) {
@@ -426,6 +425,62 @@ class AddisActiveApp {
             <button class="btn btn-primary btn-full btn-sm" onclick="alert('Successfully connected with ${c.name}!')">Join Community Layer</button>
           </div>
         `).join('')}
+      </div>
+    `;
+  }
+
+  getGovernmentDashboardHTML() {
+    const totalRoutes = DB.routes.length;
+    const totalCommunities = DB.communities.length;
+    const totalTerritories = DB.territories.length;
+
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <div>
+          <span class="section-subtitle">Municipal Intelligence</span>
+          <h3 class="section-title">City Pulse Dashboard</h3>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="window.app.renderView('home')">← Back to App</button>
+      </div>
+      <p class="section-desc">Professional overview of urban active-lifestyle infrastructure, corridors, and citizen engagement across Addis Ababa.</p>
+
+      <div class="grid-2" style="margin-bottom:1rem;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="m-val" style="color:var(--accent-lime); font-size:2rem;">${totalRoutes}</div>
+          <div class="m-lbl" style="margin-top:0.3rem;">Verified Active Corridors & Parks</div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="m-val" style="color:var(--accent-lime); font-size:2rem;">${totalCommunities}</div>
+          <div class="m-lbl" style="margin-top:0.3rem;">Registered Community Networks</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.75rem;">📊 Activity Ecosystem Distribution</h4>
+        <div style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.85rem;">
+          <div style="background:#181818; padding:0.75rem; border-radius:8px; display:flex; justify-content:space-between;">
+            <span>🏃 Running Corridors</span><strong style="color:var(--accent-lime);">8 Locations</strong>
+          </div>
+          <div style="background:#181818; padding:0.75rem; border-radius:8px; display:flex; justify-content:space-between;">
+            <span>🚶 Walking Promenades</span><strong style="color:var(--accent-lime);">6 Locations</strong>
+          </div>
+          <div style="background:#181818; padding:0.75rem; border-radius:8px; display:flex; justify-content:space-between;">
+            <span>🚴 Cycling Routes</span><strong style="color:var(--accent-lime);">3 Locations</strong>
+          </div>
+          <div style="background:#181818; padding:0.75rem; border-radius:8px; display:flex; justify-content:space-between;">
+            <span>🥾 Hiking Trails</span><strong style="color:var(--accent-lime);">3 Locations</strong>
+          </div>
+          <div style="background:#181818; padding:0.75rem; border-radius:8px; display:flex; justify-content:space-between;">
+            <span>⚽ Swimming, Football & Fitness</span><strong style="color:var(--accent-lime);">3 Locations</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">🏛️ Municipal Urban Zones (${totalTerritories} Tracked)</h4>
+        <div style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.85rem; color:var(--text-muted);">
+          ${DB.territories.map(t => `<div style="background:#181818; padding:0.75rem; border-radius:8px;">${t.icon} <strong>${t.name}</strong>: ${t.desc} (${t.routesCount} Active Zones)</div>`).join('')}
+        </div>
       </div>
     `;
   }
