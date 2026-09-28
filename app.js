@@ -37,7 +37,6 @@ class AddisActiveApp {
   }
 
   setupEventListeners() {
-    // Navigation tabs
     document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.addEventListener('click', (e) => {
         const target = tab.getAttribute('data-target');
@@ -45,17 +44,14 @@ class AddisActiveApp {
       });
     });
 
-    // Brand logo click -> Home
     document.querySelectorAll('[data-link="home"]').forEach(el => {
       el.addEventListener('click', () => this.renderView('home'));
     });
 
-    // Profile buttons
     document.querySelectorAll('[data-link="profile"]').forEach(el => {
       el.addEventListener('click', () => this.renderView('profile'));
     });
 
-    // Global Search Modal Triggers
     const searchTrigger = document.getElementById('searchTrigger');
     const searchModal = document.getElementById('searchModal');
     const searchClose = document.getElementById('searchClose');
@@ -76,7 +72,6 @@ class AddisActiveApp {
     this.currentView = viewName;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Update active tab styles
     document.querySelectorAll('.nav-tab').forEach(tab => {
       if (tab.getAttribute('data-target') === viewName) {
         tab.classList.add('active');
@@ -96,6 +91,10 @@ class AddisActiveApp {
       case 'explore':
         main.innerHTML = this.getExploreHTML('all');
         this.bindExploreEvents();
+        break;
+      case 'videos':
+        main.innerHTML = this.getVideosHTML();
+        this.bindVideoEvents();
         break;
       case 'activity':
         main.innerHTML = this.getActivityTrackerHTML();
@@ -199,7 +198,6 @@ class AddisActiveApp {
       });
     });
 
-    // Initialize Leaflet Map on Explore
     setTimeout(() => {
       if (typeof L !== 'undefined' && document.getElementById('mapContainer')) {
         const map = L.map('mapContainer').setView([9.0300, 38.7400], 12);
@@ -212,6 +210,37 @@ class AddisActiveApp {
       }
     }, 150);
   }
+
+  getVideosHTML() {
+    return `
+      <div class="view-section active">
+        <span class="section-subtitle">Video-First Discovery</span>
+        <h3 class="section-title">Addis Visual Feed</h3>
+        <p class="section-desc">“Watch before you go” — Preview routes, parks, and active corridors across Addis Ababa[span_2](start_span)[span_2](end_span).</p>
+        
+        <div style="display:flex; flex-direction:column; gap:1.25rem;">
+          ${DB.videos.map(v => `
+            <div class="card" style="margin-bottom:0; padding:0; overflow:hidden;">
+              <div style="position:relative; background:#000; height:180px;">
+                <img src="${v.thumbnail}" alt="${v.title}" style="width:100%; height:100%; object-fit:cover; opacity:0.8;">
+                <div style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.8); padding:2px 8px; border-radius:4px; font-family:var(--font-tech); font-size:0.7rem; color:var(--accent-lime);">
+                  ⏱️ ${v.duration}
+                </div>
+              </div>
+              <div style="padding:1rem;">
+                <span class="badge">${v.area}</span>
+                <h4 style="font-family:var(--font-display); font-size:1.1rem; margin:0.4rem 0;">${v.title}</h4>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">${v.desc}</p>
+                <button class="btn btn-outline btn-full btn-sm" onclick="alert('Playing video walkthrough: ${v.title}')">▶ Watch Walkthrough</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  bindVideoEvents() {}
 
   getActivityTrackerHTML() {
     return `
@@ -265,7 +294,6 @@ class AddisActiveApp {
       this.renderView('profile');
     });
 
-    // Initialize tracker Leaflet map
     setTimeout(() => {
       if (typeof L !== 'undefined' && document.getElementById('trackerMap')) {
         this.mapInstance = L.map('trackerMap').setView([9.0300, 38.7400], 14);
@@ -288,14 +316,14 @@ class AddisActiveApp {
       this.watchId = navigator.geolocation.watchPosition(
         (position) => {
           const { latitude, longitude, accuracy } = position.coords;
-          if (accuracy > 30) return; // filter weak GPS drift
+          if (accuracy > 30) return;
 
           document.getElementById('gpsStatus').innerText = 'Active';
           const newPoint = [latitude, longitude];
 
           if (this.lastCoords) {
             const distIncrement = this.calculateHaversine(this.lastCoords[0], this.lastCoords[1], latitude, longitude);
-            if (distIncrement > 0.002) { // min 2 meters movement threshold
+            if (distIncrement > 0.002) {
               this.distance += distIncrement;
               document.getElementById('distDisplay').innerText = this.distance.toFixed(2);
             }
@@ -341,7 +369,7 @@ class AddisActiveApp {
   }
 
   calculateHaversine(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Earth radius in km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -430,7 +458,6 @@ class AddisActiveApp {
   }
 }
 
-// Start application on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
   window.app = new AddisActiveApp();
 });
