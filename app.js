@@ -152,7 +152,6 @@ class AddisActiveApp {
     const actMeta = DB.activitiesMeta[profile.primaryActivity] || DB.activitiesMeta['run'];
 
     return `
-      <!-- Addis Active Today Daily Snapshot (Part 2) -->
       <div class="hero-box">
         <div class="location-tag"><span class="brand-dot"></span><span>ADDIS ABABA • 2,355M ALTITUDE</span></div>
         <h2 class="hero-title">GOOD MORNING, ${profile.username.toUpperCase()}</h2>
@@ -167,22 +166,26 @@ class AddisActiveApp {
       <div class="card">
         <span class="section-subtitle">Addis Active Today</span>
         <h3 class="section-title">📍 Nearest to You</h3>
-        <p class="section-desc">Sorted dynamically by your current GPS position.</p>
+        <p class="section-desc">Sorted dynamically by your current GPS position with full route telemetry.</p>
         <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.75rem;">
           ${sortedRoutes.map(r => `
-            <div style="background:#181818; padding:1rem; border-radius:10px; border:1px solid #222; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="window.app.showRouteDetails('${r.id}')">
+            <div class="card" style="margin-bottom:0; display:flex; flex-direction:column; justify-content:space-between;">
               <div>
+                <div style="background:#1a1a1a; padding:0.5rem 0.75rem; border-radius:8px; border:1px solid #282828; margin-bottom:0.5rem; display:flex; justify-content:space-between; align-items:center;">
+                  <span style="font-size:0.8rem; font-weight:600;">📺 Watch: ${r.videoTitle}</span>
+                  <span class="badge">⏱️ ${r.videoDuration}</span>
+                </div>
                 <span class="badge">${DB.activitiesMeta[r.activity]?.icon || '📍'} ${r.activity.toUpperCase()} •${r.area}</span>
-                <h4 style="font-family:var(--font-display); font-size:1.05rem; margin:0.3rem 0;">${r.name}</h4>
-                <p style="font-size:0.8rem; color:var(--text-muted);">📏 ${r.distance} \vert{} ⚡${r.elevation}</p>
+                <h4 style="font-family:var(--font-display); font-size:1.1rem; margin:0.3rem 0;">${r.name}</h4>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.5rem;">${r.desc}</p>
+                <div style="font-size:0.75rem; color:var(--accent-lime); font-family:var(--font-tech); margin-bottom:0.75rem;">📏 ${r.distance} | ⚡ ${r.elevation} \vert{} 🧭 ${r.surface}</div>
               </div>
-              <button class="btn btn-outline btn-sm">View</button>
+              <button class="btn btn-outline btn-full btn-sm route-detail-btn" data-id="${r.id}">View Route Details</button>
             </div>
           `).join('')}
         </div>
       </div>
 
-      <!-- Localized AI Coach (Pillar 8) -->
       <div class="card">
         <span class="section-subtitle">[DEMO] Localized AI Coach</span>
         <h3 class="section-title">High-Altitude Guidance</h3>
@@ -195,6 +198,9 @@ class AddisActiveApp {
   bindHomeEvents() {
     document.getElementById('heroExploreBtn')?.addEventListener('click', () => this.renderView('explore'));
     document.getElementById('heroTrackBtn')?.addEventListener('click', () => this.renderView('activity'));
+    document.querySelectorAll('.route-detail-btn').forEach(btn => {
+      btn.addEventListener('click', () => { this.showRouteDetails(btn.getAttribute('data-id')); });
+    });
   }
 
   getExploreHTML(filter) {
@@ -204,7 +210,7 @@ class AddisActiveApp {
     return `
       <span class="section-subtitle">Multi-Activity & Video Discovery</span>
       <h3 class="section-title">Explore 23+ Addis Locations</h3>
-      <p class="section-desc">Filter by running, walking, cycling, swimming, hiking, football, or fitness.</p>
+      <p class="section-desc">Classified strictly by exercise category (Running, Walking, Cycling, Swimming, Hiking, Football, Fitness).</p>
       
       <div class="filter-bar">
         <button class="filter-chip ${filter === 'all' ? 'active':''}" data-filter="all">All</button>
@@ -228,10 +234,7 @@ class AddisActiveApp {
               <span class="badge">${DB.activitiesMeta[r.activity]?.icon || '📍'} ${r.activity.toUpperCase()} •${r.area}</span>
               <h4 style="font-family:var(--font-display); font-size:1.1rem; margin:0.4rem 0;">${r.name}</h4>
               <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">${r.desc}</p>
-              <div style="display:flex; justify-content:space-between; font-family:var(--font-tech); font-size:0.75rem; color:var(--accent-lime); margin-bottom:1rem;">
-                <span>📏 ${r.distance}</span>
-                <span>⚡ ${r.elevation}</span>
-              </div>
+              <div style="font-size:0.75rem; color:var(--accent-lime); font-family:var(--font-tech); margin-bottom:1rem;">📏 ${r.distance} | ⚡ ${r.elevation} \vert{} 🧭 ${r.surface}</div>
             </div>
             <button class="btn btn-outline btn-full btn-sm route-detail-btn" data-id="${r.id}">View Route Details</button>
           </div>
@@ -294,8 +297,21 @@ class AddisActiveApp {
     return `
       <span class="section-subtitle">Live GPS Engine</span>
       <h3 class="section-title">Multi-Activity Tracker</h3>
-      <p class="section-desc">Track runs, rides, walks, hikes, and training locally.</p>
+      <p class="section-desc">Define your activity type before starting your local GPS session.</p>
       <div class="tracker-card">
+        <div style="margin-bottom:1rem; text-align:left;">
+          <label style="font-size:0.75rem; font-family:var(--font-tech); color:var(--text-muted);">SELECT ACTIVITY TYPE</label>
+          <select id="trackerActivityType" style="width:100%; background:#181818; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:8px; margin-top:0.3rem;">
+            <option value="run">Running 🏃</option>
+            <option value="walk">Walking 🚶</option>
+            <option value="bike">Cycling 🚴</option>
+            <option value="swim">Swimming 🏊</option>
+            <option value="hike">Hiking 🥾</option>
+            <option value="football">Football ⚽</option>
+            <option value="fitness">Fitness 🏋️</option>
+          </select>
+        </div>
+
         <div id="timerDisplay" class="timer-display">00:00:00</div>
         <div class="metrics-row">
           <div class="metric-box"><div id="distDisplay" class="m-val">0.00</div><div class="m-lbl">Kilometers</div></div>
@@ -314,8 +330,10 @@ class AddisActiveApp {
   bindTrackerEvents() {
     const startBtn = document.getElementById('startTrackBtn');
     const stopBtn = document.getElementById('stopTrackBtn');
+    const activitySelect = document.getElementById('trackerActivityType');
 
     startBtn?.addEventListener('click', () => {
+      if (activitySelect) activitySelect.disabled = true;
       startBtn.style.display = 'none';
       if (stopBtn) stopBtn.style.display = 'block';
       this.startGPSession();
@@ -323,6 +341,7 @@ class AddisActiveApp {
 
     stopBtn?.addEventListener('click', () => {
       this.stopGPSession();
+      if (activitySelect) activitySelect.disabled = false;
       if (DB.userProfile) {
         DB.userProfile.xp += 100;
         if (DB.userProfile.xp >= 150) DB.userProfile.level = 2;
