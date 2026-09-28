@@ -123,8 +123,8 @@ class AddisActiveApp {
       case 'explore': wrapper.innerHTML = this.getExploreHTML(this.currentExploreFilter); this.bindExploreEvents(); break;
       case 'activity': wrapper.innerHTML = this.getActivityTrackerHTML(); this.bindTrackerEvents(); break;
       case 'community': wrapper.innerHTML = this.getCommunityHTML(); break;
-      case 'profile': wrapper.innerHTML = this.getProfileHTML(); this.bindProfileEvents(); break;
       case 'gov': wrapper.innerHTML = this.getGovernmentDashboardHTML(); break;
+      case 'profile': wrapper.innerHTML = this.getProfileHTML(); this.bindProfileEvents(); break;
       default: wrapper.innerHTML = this.getHomeHTML();
     }
 
@@ -162,7 +162,6 @@ class AddisActiveApp {
         <div class="hero-btns">
           <button class="btn btn-primary" id="heroExploreBtn">Active Near Me</button>
           <button class="btn btn-outline" id="heroTrackBtn">Start GPS Session</button>
-          <button class="btn btn-outline" onclick="window.app.renderView('gov')" style="border-color:var(--accent-lime); color:var(--accent-lime);">🏛️ City Pulse (Gov)</button>
         </div>
       </div>
 
@@ -435,13 +434,8 @@ class AddisActiveApp {
     const totalTerritories = DB.territories.length;
 
     return `
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-        <div>
-          <span class="section-subtitle">Municipal Intelligence</span>
-          <h3 class="section-title">City Pulse Dashboard</h3>
-        </div>
-        <button class="btn btn-outline btn-sm" onclick="window.app.renderView('home')">← Back to App</button>
-      </div>
+      <span class="section-subtitle">Municipal Intelligence</span>
+      <h3 class="section-title">City Pulse Dashboard</h3>
       <p class="section-desc">Professional overview of urban active-lifestyle infrastructure, corridors, and citizen engagement across Addis Ababa.</p>
 
       <div class="grid-2" style="margin-bottom:1rem;">
