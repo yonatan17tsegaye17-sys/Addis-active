@@ -51,6 +51,26 @@ export const DB = {
       completionsCount: 54
     }
   ],
+  videos: [
+    {
+      id: 'v1',
+      title: 'Entoto Mountain Ridge Walkthrough',
+      area: 'Entoto Mountain',
+      duration: '3:45',
+      thumbnail: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80',
+      embedUrl: 'https://www.youtube.com/embed/K5-GKrUrInI',
+      desc: '[DEMO] Visual preview of the high-altitude eucalyptus trails and panoramic city viewpoints[span_0](start_span)[span_0](end_span).'
+    },
+    {
+      id: 'v2',
+      title: 'Bole Corridor & Morning Tarmac Tour',
+      area: 'Bole / Edna Mall',
+      duration: '2:30',
+      thumbnail: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80',
+      embedUrl: 'https://www.youtube.com/embed/placeholder',
+      desc: '[DEMO] Smooth sidewalks and early morning running conditions across the Bole commercial corridor[span_1](start_span)[span_1](end_span).'
+    }
+  ],
   communities: [
     {
       id: 'c1',
