@@ -24,7 +24,48 @@
     <div class="splash-content">
       <span class="splash-logo">⚡</span>
       <h1 class="splash-title">ADDIS ACTIVE</h1>
-      <span class="splash-subtitle">BETA v1.0 • ALtitude 2,355M</span>
+      <span class="splash-subtitle">BETA v1.0 • 2,355M ALTITUDE</span>
+    </div>
+  </div>
+
+  <!-- Onboarding Modal / View -->
+  <div id="onboardingModal" class="search-modal" style="display:none; align-items:center;">
+    <div class="search-modal-content" style="max-width:450px;">
+      <span class="section-subtitle">Welcome to Addis Active</span>
+      <h3 class="section-title" style="font-size:1.4rem; margin-bottom:0.5rem;">Setup Your Profile</h3>
+      <p class="section-desc">Enter your details to tailor routes, proximity, and goals.</p>
+      
+      <form id="onboardingForm" style="display:flex; flex-direction:column; gap:1rem;">
+        <div>
+          <label style="font-size:0.8rem; font-family:var(--font-tech); color:var(--text-muted);">YOUR NAME / HANDLE</label>
+          <input type="text" id="setupName" placeholder="e.g. Dawit M." required style="width:100%; background:#181818; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:8px; margin-top:0.3rem;">
+        </div>
+        <div>
+          <label style="font-size:0.8rem; font-family:var(--font-tech); color:var(--text-muted);">PRIMARY ACTIVITY</label>
+          <select id="setupActivity" style="width:100%; background:#181818; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:8px; margin-top:0.3rem;">
+            <option value="run">Running 🏃</option>
+            <option value="walk">Walking 🚶</option>
+            <option value="bike">Cycling 🚴</option>
+            <option value="swim">Swimming 🏊</option>
+            <option value="hike">Hiking 🥾</option>
+            <option value="football">Football ⚽</option>
+            <option value="fitness">Fitness 🏋️</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.8rem; font-family:var(--font-tech); color:var(--text-muted);">HOME CORRIDOR / AREA</label>
+          <input type="text" id="setupArea" placeholder="e.g. Bole / Edna Mall" required style="width:100%; background:#181818; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:8px; margin-top:0.3rem;">
+        </div>
+        <div>
+          <label style="font-size:0.8rem; font-family:var(--font-tech); color:var(--text-muted);">FITNESS LEVEL</label>
+          <select id="setupLevel" style="width:100%; background:#181818; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:8px; margin-top:0.3rem;">
+            <option value="Recreational">Recreational</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced / Endurance">Advanced / Endurance</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" style="margin-top:0.5rem;">Launch Addis Active ⚡</button>
+      </form>
     </div>
   </div>
 
@@ -38,7 +79,7 @@
         <span class="brand-logo">⚡</span>
         <div>
           <h1 class="brand-name">ADDIS ACTIVE</h1>
-          <span class="brand-badge">NATIVE PWA</span>
+          <span class="brand-badge">PROXIMITY ENGINE</span>
         </div>
       </div>
       <div class="header-actions">
@@ -50,17 +91,15 @@
 
   <main id="appMain" class="app-main"></main>
 
-  <!-- Native Bottom Sheet Modal -->
+  <!-- Action Sheet Modal -->
   <div id="detailModal" class="action-sheet-overlay">
-    <div class="action-sheet-content" id="detailModalContent">
-      <!-- Dynamic Details Render Here -->
-    </div>
+    <div class="action-sheet-content" id="detailModalContent"></div>
   </div>
 
   <div id="searchModal" class="search-modal">
     <div class="search-modal-content">
       <div class="search-bar-header">
-        <input type="text" id="globalSearchInput" placeholder="Search corridors, parks, routes..." autocomplete="off">
+        <input type="text" id="globalSearchInput" placeholder="Search 20+ locations, parks, corridors..." autocomplete="off">
         <button id="searchClose" class="btn-close">✕</button>
       </div>
       <div id="searchResults" class="search-results-list">
