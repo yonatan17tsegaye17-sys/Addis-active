@@ -94,6 +94,26 @@ class AddisActiveApp {
     detailModal?.addEventListener('click', (e) => {
       if (e.target === detailModal) detailModal.classList.remove('active');
     });
+
+    // Bulletproof Global Event Delegation for Explore Filters & Route Details
+    document.addEventListener('click', (e) => {
+      const detailBtn = e.target.closest('.route-detail-btn');
+      if (detailBtn) {
+        const id = detailBtn.getAttribute('data-id');
+        this.showRouteDetails(id);
+      }
+
+      const filterChip = e.target.closest('.filter-chip');
+      if (filterChip) {
+        const filter = filterChip.getAttribute('data-filter');
+        this.currentExploreFilter = filter;
+        const main = document.getElementById('appMain');
+        if (main) {
+          const wrapper = main.querySelector('.view-section');
+          if (wrapper) wrapper.innerHTML = this.getExploreHTML(filter);
+        }
+      }
+    });
   }
 
   renderView(viewName) {
@@ -120,7 +140,7 @@ class AddisActiveApp {
 
     switch(viewName) {
       case 'home': wrapper.innerHTML = this.getHomeHTML(); this.bindHomeEvents(); break;
-      case 'explore': wrapper.innerHTML = this.getExploreHTML(this.currentExploreFilter); this.bindExploreEvents(); break;
+      case 'explore': wrapper.innerHTML = this.getExploreHTML(this.currentExploreFilter); break;
       case 'activity': wrapper.innerHTML = this.getActivityTrackerHTML(); this.bindTrackerEvents(); break;
       case 'community': wrapper.innerHTML = this.getCommunityHTML(); break;
       case 'gov': wrapper.innerHTML = this.getGovernmentDashboardHTML(); break;
@@ -193,9 +213,6 @@ class AddisActiveApp {
   bindHomeEvents() {
     document.getElementById('heroExploreBtn')?.addEventListener('click', () => this.renderView('explore'));
     document.getElementById('heroTrackBtn')?.addEventListener('click', () => this.renderView('activity'));
-    document.querySelectorAll('.route-detail-btn').forEach(btn => {
-      btn.addEventListener('click', () => { this.showRouteDetails(btn.getAttribute('data-id')); });
-    });
   }
 
   getExploreHTML(filter) {
@@ -237,24 +254,6 @@ class AddisActiveApp {
         `).join('')}
       </div>
     `;
-  }
-
-  bindExploreEvents() {
-    document.querySelectorAll('.filter-chip').forEach(chip => {
-      chip.addEventListener('click', (e) => {
-        const filter = e.target.getAttribute('data-filter');
-        const main = document.getElementById('appMain');
-        if (main) {
-          const wrapper = main.querySelector('.view-section');
-          if (wrapper) wrapper.innerHTML = this.getExploreHTML(filter);
-          this.bindExploreEvents();
-        }
-      });
-    });
-
-    document.querySelectorAll('.route-detail-btn').forEach(btn => {
-      btn.addEventListener('click', () => { this.showRouteDetails(btn.getAttribute('data-id')); });
-    });
   }
 
   showRouteDetails(routeId) {
