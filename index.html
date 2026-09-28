@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Addis Active | Discover, Move & Connect in Addis Ababa</title>
   
+  <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#080808">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,386 +13,101 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 
-  <style>
-    :root {
-      --bg-main: #080808;
-      --bg-card: #121212;
-      --accent-lime: #CCFF00;
-      --accent-lime-dim: rgba(204, 255, 0, 0.15);
-      --text-primary: #FFFFFF;
-      --text-muted: #A0A0A0;
-      --border-color: #222222;
-      --font-display: 'Syne', sans-serif;
-      --font-sans: 'Inter', sans-serif;
-      --font-tech: 'JetBrains Mono', monospace;
-      --header-height: 64px;
-      --nav-height: 70px;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-    body {
-      background-color: var(--bg-main);
-      color: var(--text-primary);
-      font-family: var(--font-sans);
-      min-height: 100vh;
-      padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 20px));
-      overflow-x: hidden;
-    }
-
-    /* Onboarding Setup Modal */
-    .onboarding-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(12px);
-      z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 1rem;
-    }
-    .onboarding-card {
-      background: var(--bg-card); border: 1px solid rgba(204,255,0,0.3); border-radius: 20px;
-      width: 100%; max-width: 450px; padding: 2rem; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-    }
-
-    .app-header {
-      position: sticky; top: 0; background: rgba(8, 8, 8, 0.88); backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border-color); height: var(--header-height); z-index: 1000;
-      display: flex; align-items: center; padding: 0 1rem;
-    }
-    .header-inner { width: 100%; max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-    .brand-box { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; }
-    .brand-logo { font-size: 1.4rem; background: var(--accent-lime-dim); padding: 6px; border-radius: 8px; border: 1px solid rgba(204,255,0,0.3); }
-    .brand-name { font-family: var(--font-display); font-size: 1.1rem; font-weight: 800; }
-    .brand-badge { font-family: var(--font-tech); font-size: 0.6rem; color: var(--accent-lime); background: rgba(204,255,0,0.1); padding: 2px 6px; border-radius: 4px; }
-
-    .app-main { width: 100%; max-width: 850px; margin: 0 auto; padding: 1.25rem 1rem; }
-    
-    /* Smooth Native View Transitions */
-    .view-section { display: none; opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; }
-    .view-section.active { display: block; opacity: 1; transform: translateY(0); }
-
-    .section-subtitle { font-family: var(--font-tech); font-size: 0.75rem; color: var(--accent-lime); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.2rem; }
-    .section-title { font-family: var(--font-display); font-size: 1.75rem; font-weight: 800; margin-bottom: 0.4rem; }
-    .section-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem; }
-
-    .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.25rem; margin-bottom: 1rem; }
-    .hero-box { background: linear-gradient(135deg, #141810 0%, var(--bg-card) 100%); border: 1px solid rgba(204,255,0,0.25); border-radius: 18px; padding: 2rem 1.25rem; text-align: center; margin-bottom: 1.5rem; }
-    .location-tag { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-tech); font-size: 0.7rem; color: var(--accent-lime); background: var(--accent-lime-dim); padding: 4px 10px; border-radius: 20px; margin-bottom: 1rem; }
-    .brand-dot { width: 6px; height: 6px; background: var(--accent-lime); border-radius: 50%; }
-
-    .hero-title { font-family: var(--font-display); font-size: clamp(1.8rem, 5vw, 2.4rem); font-weight: 900; line-height: 1.1; margin-bottom: 0.5rem; }
-    .hero-tagline { font-family: var(--font-tech); font-size: 0.8rem; color: var(--text-muted); letter-spacing: 1.5px; margin-bottom: 1rem; }
-    .hero-desc { color: var(--text-muted); font-size: 0.95rem; max-width: 500px; margin: 0 auto 1.5rem auto; }
-    .hero-btns { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
-
-    .btn { font-family: var(--font-sans); font-weight: 600; font-size: 0.9rem; padding: 0.75rem 1.25rem; border-radius: 10px; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
-    .btn-primary { background: var(--accent-lime); color: #000; }
-    .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
-    .btn-full { width: 100%; }
-    .btn-sm { padding: 0.5rem 0.85rem; font-size: 0.8rem; }
-
-    .badge { font-family: var(--font-tech); font-size: 0.65rem; font-weight: 600; background: var(--accent-lime-dim); color: var(--accent-lime); padding: 3px 8px; border-radius: 4px; text-transform: uppercase; display: inline-block; }
-
-    .filter-bar { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 1rem; scrollbar-width: none; }
-    .filter-bar::-webkit-scrollbar { display: none; }
-    .filter-chip { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.8rem; font-weight: 500; padding: 6px 14px; border-radius: 20px; white-space: nowrap; cursor: pointer; }
-    .filter-chip.active { background: var(--accent-lime); color: #000; border-color: var(--accent-lime); font-weight: 600; }
-
-    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-    @media(min-width: 650px) { .grid-2 { grid-template-columns: repeat(2, 1fr); } }
-
-    .action-sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 4000; display: none; align-items: flex-end; }
-    .action-sheet-overlay.active { display: flex; }
-    .action-sheet-content { background: #141414; border-top: 1px solid var(--border-color); width: 100%; max-width: 700px; margin: 0 auto; border-radius: 20px 20px 0 0; padding: 1.5rem; max-height: 85vh; overflow-y: auto; }
-
-    .form-input { width: 100%; background: #181818; border: 1px solid var(--border-color); color: #fff; padding: 0.75rem; border-radius: 8px; margin-top: 0.3rem; margin-bottom: 1rem; font-size: 0.95rem; }
-    .form-label { font-size: 0.75rem; font-family: var(--font-tech); color: var(--text-muted); text-transform: uppercase; }
-
-    .mobile-nav {
-      position: fixed; bottom: 0; left: 0; right: 0; background: rgba(8, 8, 8, 0.92); backdrop-filter: blur(16px);
-      border-top: 1px solid var(--border-color); height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
-      padding-bottom: env(safe-area-inset-bottom, 0px); display: flex; justify-content: space-around; align-items: center; z-index: 2000;
-    }
-    .nav-tab { background: transparent; border: none; color: var(--text-dim, #666); display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; flex: 1; }
-    .nav-tab .nav-icon { font-size: 1.25rem; }
-    .nav-tab .nav-text { font-family: var(--font-tech); font-size: 0.65rem; text-transform: uppercase; }
-    .nav-tab.active { color: var(--accent-lime); }
-  </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
-  <!-- Onboarding Modal -->
-  <div id="onboardingModal" class="onboarding-overlay" style="display:none;">
-    <div class="onboarding-card">
+  <!-- Native Splash Screen -->
+  <div id="splashScreen" class="splash-screen">
+    <div class="splash-content">
+      <span class="splash-logo">⚡</span>
+      <h1 class="splash-title">ADDIS ACTIVE</h1>
+      <span class="splash-subtitle">BETA v1.0 • 2,355M ALTITUDE</span>
+    </div>
+  </div>
+
+  <!-- Mandatory Onboarding Sign-Up Modal -->
+  <div id="onboardingModal" class="search-modal" style="display:none; align-items:center;">
+    <div class="search-modal-content" style="max-width:450px;">
       <span class="section-subtitle">Welcome to Addis Active</span>
       <h3 class="section-title" style="font-size:1.4rem; margin-bottom:0.5rem;">Setup Your Profile</h3>
-      <p class="section-desc">Personalize your training at 2,355m altitude.</p>
+      <p class="section-desc">Enter your details to tailor routes, proximity sorting, and gamification.</p>
       
-      <form onsubmit="app.handleOnboarding(event)">
-        <label class="form-label">Your Name / Handle</label>
-        <input type="text" id="setupName" class="form-input" placeholder="e.g. Dawit M." required>
-        
-        <label class="form-label">Primary Activity</label>
-        <select id="setupActivity" class="form-input">
-          <option value="run">Running 🏃</option>
-          <option value="walk">Walking 🚶</option>
-          <option value="bike">Cycling 🚴</option>
-          <option value="swim">Swimming 🏊</option>
-          <option value="hike">Hiking 🥾</option>
-          <option value="football">Football ⚽</option>
-          <option value="fitness">Fitness 🏋️</option>
-        </select>
-
-        <label class="form-label">Home Corridor / Area</label>
-        <input type="text" id="setupArea" class="form-input" placeholder="e.g. Bole / Edna Mall" required>
-
+      <form id="onboardingForm" style="display:flex; flex-direction:column; gap:1rem;">
+        <div>
+          <label style="font-size:0.8rem; font-family:var(--font-tech); color:var(--text-muted);">YOUR NAME / HANDLE</label>
+          <input type="text" id="setupName" placeholder="e.g. Dawit M." required style="width:100%; background:#181818; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:8px; margin-top:0.3rem;">
+        </div>
+        <div>
+          <label style="font-size:0.8rem; font-family:var(--font-tech); color:var(--text-muted);">PRIMARY ACTIVITY</label>
+          <select id="setupActivity" style="width:100%; background:#181818; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:8px; margin-top:0.3rem;">
+            <option value="run">Running 🏃</option>
+            <option value="walk">Walking 🚶</option>
+            <option value="bike">Cycling 🚴</option>
+            <option value="swim">Swimming 🏊</option>
+            <option value="hike">Hiking 🥾</option>
+            <option value="football">Football ⚽</option>
+            <option value="fitness">Fitness 🏋️</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.8rem; font-family:var(--font-tech); color:var(--text-muted);">HOME CORRIDOR / AREA</label>
+          <input type="text" id="setupArea" placeholder="e.g. Bole / Edna Mall" required style="width:100%; background:#181818; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:8px; margin-top:0.3rem;">
+        </div>
         <button type="submit" class="btn btn-primary btn-full" style="margin-top:0.5rem;">Launch Addis Active ⚡</button>
       </form>
     </div>
   </div>
 
+  <div id="offlineBanner" class="offline-banner" style="display:none;">
+    <span>⚡ Offline Mode Active — Local routes and tracking work normally.</span>
+  </div>
+
   <header class="app-header">
     <div class="header-inner">
-      <div class="brand-box" onclick="app.renderView('home')">
+      <div class="brand-box" data-link="home" style="cursor:pointer;">
         <span class="brand-logo">⚡</span>
         <div>
           <h1 class="brand-name">ADDIS ACTIVE</h1>
-          <span class="brand-badge">NATIVE PWA</span>
+          <span class="brand-badge">PROXIMITY PWA</span>
         </div>
+      </div>
+      <div class="header-actions">
+        <button id="searchTrigger" class="icon-btn" aria-label="Search">🔍</button>
+        <button class="icon-btn" data-link="profile" aria-label="Profile">👤</button>
       </div>
     </div>
   </header>
 
   <main id="appMain" class="app-main"></main>
 
-  <div id="detailModal" class="action-sheet-overlay" onclick="if(event.target === this) this.classList.remove('active')">
+  <!-- Native Action Sheet Modal -->
+  <div id="detailModal" class="action-sheet-overlay">
     <div class="action-sheet-content" id="detailModalContent"></div>
   </div>
 
+  <div id="searchModal" class="search-modal">
+    <div class="search-modal-content">
+      <div class="search-bar-header">
+        <input type="text" id="globalSearchInput" placeholder="Search corridors, parks, routes..." autocomplete="off">
+        <button id="searchClose" class="btn-close">✕</button>
+      </div>
+      <div id="searchResults" class="search-results-list">
+        <p class="search-hint">Type anything to explore Addis Ababa...</p>
+      </div>
+    </div>
+  </div>
+
   <nav class="mobile-nav" aria-label="Bottom Navigation">
-    <button class="nav-tab active" data-target="home" onclick="app.renderView('home')"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></button>
-    <button class="nav-tab" data-target="explore" onclick="app.renderView('explore')"><span class="nav-icon">🗺️</span><span class="nav-text">Explore</span></button>
-    <button class="nav-tab" data-target="activity" onclick="app.renderView('activity')"><span class="nav-icon">⚡</span><span class="nav-text">Track</span></button>
-    <button class="nav-tab" data-target="profile" onclick="app.renderView('profile')"><span class="nav-icon">👤</span><span class="nav-text">Journey</span></button>
+    <button class="nav-tab active" data-target="home"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></button>
+    <button class="nav-tab" data-target="explore"><span class="nav-icon">🗺️</span><span class="nav-text">Explore</span></button>
+    <button class="nav-tab" data-target="activity"><span class="nav-icon">⚡</span><span class="nav-text">Track</span></button>
+    <button class="nav-tab" data-target="profile"><span class="nav-icon">👤</span><span class="nav-text">Journey</span></button>
   </nav>
 
-  <script>
-    const DB = {
-      userProfile: JSON.parse(localStorage.getItem('addis_profile')) || null,
-      routes: [
-        { id: 'r1', name: 'Entoto Forest Ridge Loop', activity: 'hike', area: 'Entoto Mountain', distance: '10.5 KM', elevation: '+340m Gain', desc: 'High-altitude trail winding through eucalyptus canopy.', surface: 'Trail / Loose Gravel', facilities: ['Parking', 'Restrooms', 'Water'], videoTitle: 'Entoto Mountain Ridge Walkthrough', videoDuration: '3:45', communityNotes: 'Bring hydration.' },
-        { id: 'r2', name: 'Bole Boulevard Sunrise Tarmac', activity: 'run', area: 'Bole', distance: '5.2 KM', elevation: '+45m Gain', desc: 'Smooth urban stretch featuring wide sidewalks.', surface: 'Smooth Asphalt', facilities: ['Parking', 'Restrooms', 'Cafes'], videoTitle: 'Bole Corridor Sunrise Tour', videoDuration: '2:30', communityNotes: 'Best run at 6 AM.' },
-        { id: 'r3', name: 'Unity Park & Palace Grounds', activity: 'walk', area: 'Arat Kilo', distance: '3.8 KM', elevation: '+20m Gain', desc: 'Scenic historic walk through restored palace grounds.', surface: 'Paved Walkways', facilities: ['Restrooms', 'Water Kiosks'], videoTitle: 'Unity Park Gardens Preview', videoDuration: '4:15', communityNotes: 'Great family walk.' },
-        { id: 'r4', name: 'Churchill Avenue Corridor', activity: 'run', area: 'City Center', distance: '6.0 KM', elevation: '+30m Gain', desc: 'Newly revamped urban corridor with wide pedestrian walks.', surface: 'New Asphalt', facilities: ['Public Plazas', 'LED Lighting'], videoTitle: 'Churchill Avenue Transformation', videoDuration: '3:00', communityNotes: 'Part of corridor project.' },
-        { id: 'r5', name: 'Meskel Square Stadium Loop', activity: 'run', area: 'Meskel Square', distance: '3.0 KM', elevation: '+15m Gain', desc: 'Historic heart of Ethiopian running culture.', surface: 'Tarmac & Rubber Track', facilities: ['Parking', 'Restrooms'], videoTitle: 'Meskel Square Evening Vibe', videoDuration: '2:10', communityNotes: 'Busy in evenings.' },
-        { id: 'r6', name: 'Sheger Riverside Promenade', activity: 'walk', area: 'Kazanchis', distance: '7.5 KM', elevation: '+50m Gain', desc: 'Lush riverside walkway cutting through central Addis.', surface: 'Paved Stone', facilities: ['Restrooms', 'Cafes'], videoTitle: 'Sheger Riverside Promenade', videoDuration: '5:00', communityNotes: 'Beautiful sunset stroll.' }
-      ]
-    };
-
-    class AddisActiveApp {
-      constructor() {
-        if (!DB.userProfile) {
-          document.getElementById('onboardingModal').style.display = 'flex';
-        }
-        this.renderView('home');
-      }
-
-      handleOnboarding(e) {
-        e.preventDefault();
-        const username = document.getElementById('setupName').value;
-        const primaryActivity = document.getElementById('setupActivity').value;
-        const homeArea = document.getElementById('setupArea').value;
-
-        DB.userProfile = {
-          username,
-          primaryActivity,
-          homeArea,
-          activeGoals: [{ title: `First ${primaryActivity.toUpperCase()} Session`, target: '5 KM', progress: '0 KM', status: 'In Progress' }]
-        };
-
-        localStorage.setItem('addis_profile', JSON.stringify(DB.userProfile));
-        document.getElementById('onboardingModal').style.display = 'none';
-        this.renderView('home');
-      }
-
-      renderView(viewName) {
-        if (!DB.userProfile) {
-          document.getElementById('onboardingModal').style.display = 'flex';
-          return;
-        }
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        document.querySelectorAll('.nav-tab').forEach(tab => {
-          if (tab.getAttribute('data-target') === viewName) tab.classList.add('active');
-          else tab.classList.remove('active');
-        });
-
-        const main = document.getElementById('appMain');
-        if (!main) return;
-
-        // Toggle active view section with smooth transition
-        main.innerHTML = '';
-        const wrapper = document.createElement('div');
-        wrapper.className = 'view-section';
-        
-        if (viewName === 'home') wrapper.innerHTML = this.getHomeHTML();
-        else if (viewName === 'explore') wrapper.innerHTML = this.getExploreHTML('all');
-        else if (viewName === 'activity') wrapper.innerHTML = this.getActivityHTML();
-        else if (viewName === 'profile') wrapper.innerHTML = this.getProfileHTML();
-
-        main.appendChild(wrapper);
-        setTimeout(() => wrapper.classList.add('active'), 10);
-      }
-
-      getHomeHTML() {
-        const p = DB.userProfile;
-        return `
-          <div class="hero-box">
-            <div class="location-tag"><span class="brand-dot"></span><span>ADDIS ABABA • 2,355M ALTITUDE</span></div>
-            <h2 class="hero-title">WELCOME BACK, ${p.username.toUpperCase()}</h2>
-            <p class="hero-tagline">ZONE: ${p.homeArea.toUpperCase()}</p>
-            <p class="hero-desc">Engine tuned for ${p.primaryActivity} sessions across Addis.</p>
-            <div class="hero-btns">
-              <button class="btn btn-primary" onclick="app.renderView('explore')">Explore Addis & Videos</button>
-              <button class="btn btn-outline" onclick="app.renderView('activity')">Start Activity</button>
-            </div>
-          </div>
-          <div class="card">
-            <span class="section-subtitle">Featured Locations</span>
-            <h3 class="section-title">Nearest to You</h3>
-            <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.75rem;">
-              ${DB.routes.slice(0, 3).map(r => `
-                <div style="background:#181818; padding:1rem; border-radius:10px; border:1px solid #222; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="app.showDetails('${r.id}')">
-                  <div>
-                    <span class="badge">${r.activity} •${r.area}</span>
-                    <h4 style="font-family:var(--font-display); font-size:1.05rem; margin:0.3rem 0;">${r.name}</h4>
-                    <p style="font-size:0.8rem; color:var(--text-muted);">📏 ${r.distance} \vert{} ⚡${r.elevation}</p>
-                  </div>
-                  <button class="btn btn-outline btn-sm">View</button>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      }
-
-      getExploreHTML(filter) {
-        const routes = filter === 'all' ? DB.routes : DB.routes.filter(r => r.activity === filter);
-        return `
-          <span class="section-subtitle">Explore & Video Discovery</span>
-          <h3 class="section-title">Corridors, Parks & Watch Feeds</h3>
-          <p class="section-desc">Watch location video previews and inspect route telemetry together.</p>
-          
-          <div class="filter-bar">
-            <button class="filter-chip ${filter==='all'?'active':''}" onclick="app.renderExplore('all')">All</button>
-            <button class="filter-chip ${filter==='run'?'active':''}" onclick="app.renderExplore('run')">Run</button>
-            <button class="filter-chip ${filter==='walk'?'active':''}" onclick="app.renderExplore('walk')">Walk</button>
-            <button class="filter-chip ${filter==='hike'?'active':''}" onclick="app.renderExplore('hike')">Hike</button>
-          </div>
-
-          <div class="grid-2" style="margin-top:1rem;" id="exploreGrid">
-            ${routes.map(r => `
-              <div class="card" style="margin-bottom:0; display:flex; flex-direction:column; justify-content:space-between;">
-                <div>
-                  <div style="background:#1a1a1a; padding:0.75rem; border-radius:8px; border:1px solid #282828; margin-bottom:0.75rem; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="font-size:0.85rem; font-weight:600;">📺 Watch: ${r.videoTitle}</span>
-                    <span class="badge">⏱️ ${r.videoDuration}</span>
-                  </div>
-                  <span class="badge">${r.activity} •${r.area}</span>
-                  <h4 style="font-family:var(--font-display); font-size:1.1rem; margin:0.4rem 0;">${r.name}</h4>
-                  <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">${r.desc}</p>
-                  <div style="font-size:0.75rem; color:var(--accent-lime); font-family:var(--font-tech); margin-bottom:1rem;">📏 ${r.distance} \vert{} ⚡${r.elevation}</div>
-                </div>
-                <button class="btn btn-outline btn-full btn-sm" onclick="app.showDetails('${r.id}')">View Full Details</button>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      }
-
-      renderExplore(filter) {
-        const main = document.getElementById('appMain');
-        if(main) {
-          const wrapper = main.querySelector('.view-section');
-          if(wrapper) wrapper.innerHTML = this.getExploreHTML(filter);
-        }
-      }
-
-      showDetails(id) {
-        const r = DB.routes.find(x => x.id === id);
-        if(!r) return;
-        const modal = document.getElementById('detailModal');
-        const content = document.getElementById('detailModalContent');
-        content.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-            <span class="badge">${r.activity} • ${r.area}</span>
-            <button class="btn btn-outline btn-sm" onclick="document.getElementById('detailModal').classList.remove('active')">✕ Close</button>
-          </div>
-          <h3 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:0.5rem;">${r.name}</h3>
-          <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1rem;">${r.desc}</p>
-          
-          <div style="background:#181818; padding:1rem; border-radius:10px; margin-bottom:1rem; font-size:0.85rem; display:flex; flex-direction:column; gap:0.5rem;">
-            <div>📏 <strong>Distance:</strong> ${r.distance}</div>
-            <div>⚡ <strong>Elevation:</strong> ${r.elevation}</div>
-            <div>🧭 <strong>Surface:</strong> ${r.surface}</div>
-          </div>
-
-          <h4 style="font-family:var(--font-display); font-size:1rem; margin-bottom:0.5rem;">Facilities & Amenities</h4>
-          <div style="display:flex; flex-direction:column; gap:0.4rem; font-size:0.85rem; margin-bottom:1.25rem;">
-            ${r.facilities.map(f => `<div style="background:#181818; padding:0.5rem 0.75rem; border-radius:8px; color:var(--text-muted);">✓ ${f}</div>`).join('')}
-          </div>
-
-          <button class="btn btn-primary btn-full" onclick="alert('Route saved to your profile!'); document.getElementById('detailModal').classList.remove('active');">⭐ Save Route</button>
-        `;
-        modal.classList.add('active');
-      }
-
-      getActivityHTML() {
-        return `
-          <span class="section-subtitle">GPS Engine</span>
-          <h3 class="section-title">Activity Tracker</h3>
-          <div class="card" style="text-align:center; padding:2rem;">
-            <div style="font-family:var(--font-tech); font-size:3rem; color:var(--accent-lime); margin-bottom:1rem;">00:00:00</div>
-            <button class="btn btn-primary btn-full" onclick="alert('GPS session started!')">Start Session</button>
-          </div>
-        `;
-      }
-
-      getProfileHTML() {
-        const p = DB.userProfile;
-        return `
-          <span class="section-subtitle">My Journey & Goals</span>
-          <h3 class="section-title">${p.username}'s Dashboard</h3>
-          <div class="card" style="border-color:var(--accent-lime);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-              <h4 style="font-family:var(--font-display); font-size:1.1rem;">🎯 Personal Goals</h4>
-              <button class="btn btn-primary btn-sm" onclick="app.addGoal()">+ Add Goal</button>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:0.75rem;">
-              ${p.activeGoals.map(g => `
-                <div style="background:#181818; padding:0.85rem; border-radius:10px; border:1px solid #222;">
-                  <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.9rem; margin-bottom:0.3rem;">
-                    <span>${g.title}</span>
-                    <span style="font-family:var(--font-tech); color:var(--accent-lime);">${g.progress} /${g.target}</span>
-                  </div>
-                  <div style="font-family:var(--font-tech); font-size:0.65rem; color:var(--text-dim);">${g.status}</div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      }
-
-      addGoal() {
-        const title = prompt('Enter custom goal title (e.g., Weekly 15K Run):');
-        const target = prompt('Enter target distance (e.g., 15 KM):');
-        if(title && target) {
-          DB.userProfile.activeGoals.push({ title, target, progress: '0 KM', status: 'In Progress' });
-          localStorage.setItem('addis_profile', JSON.stringify(DB.userProfile));
-          this.renderView('profile');
-        }
-      }
-    }
-
-    const app = new AddisActiveApp();
-  </script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
