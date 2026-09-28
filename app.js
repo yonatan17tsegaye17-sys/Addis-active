@@ -114,6 +114,7 @@ class AddisActiveApp {
   }
 
   getHomeHTML() {
+    const profile = DB.userProfile;
     return `
       <div class="view-section active">
         <div class="hero-box">
@@ -121,9 +122,9 @@ class AddisActiveApp {
             <span class="brand-dot"></span>
             <span>ADDIS ABABA • 2,355M ALTITUDE</span>
           </div>
-          <h2 class="hero-title">DISCOVER, MOVE & CONNECT.</h2>
-          <p class="hero-tagline">THE ACTIVE LIFE ENGINE FOR ETHIOPIA'S CAPITAL</p>
-          <p class="hero-desc">Explore verified mountain routes, join community running sessions, and track your movement across Addis Ababa.</p>
+          <h2 class="hero-title">WELCOME BACK, ${profile.username.toUpperCase()}</h2>
+          <p class="hero-tagline">FAVORITE ZONE: ${profile.homeArea.toUpperCase()}</p>
+          <p class="hero-desc">Your personalized active engine is tuned for ${profile.primaryActivity} sessions across Addis Ababa.</p>
           <div class="hero-btns">
             <button class="btn btn-primary" id="heroExploreBtn">Explore Addis</button>
             <button class="btn btn-outline" id="heroTrackBtn">Start Activity</button>
@@ -131,15 +132,15 @@ class AddisActiveApp {
         </div>
 
         <div class="card">
-          <span class="section-subtitle">City Pulse</span>
-          <h3 class="section-title">Active Schedule</h3>
-          <p class="section-desc">Upcoming community sessions and verified routes.</p>
+          <span class="section-subtitle">Personalized Feed</span>
+          <h3 class="section-title">Recommended for You</h3>
+          <p class="section-desc">Tailored based on your preference for ${profile.primaryActivity} sessions.</p>
           <div style="display:flex; flex-direction:column; gap:0.75rem;">
-            ${DB.events.map(ev => `
+            ${DB.routes.map(r => `
               <div style="background:#181818; padding:1rem; border-radius:8px; border:1px solid #222;">
-                <span class="badge">${ev.activityId}</span>
-                <h4 style="font-family:var(--font-display); font-size:1.1rem; margin:0.3rem 0;">${ev.title}</h4>
-                <p style="font-size:0.850rem; color:var(--text-muted);">📍 ${ev.location} \vert{} ⏰${ev.startTime}</p>
+                <span class="badge">${r.activity} •${r.area}</span>
+                <h4 style="font-family:var(--font-display); font-size:1.1rem; margin:0.3rem 0;">${r.name}</h4>
+                <p style="font-size:0.850rem; color:var(--text-muted);">📏 ${r.distance} \vert{} ⚡${r.elevation}</p>
               </div>
             `).join('')}
           </div>
@@ -403,15 +404,34 @@ class AddisActiveApp {
   bindEventEvents() {}
 
   getProfileHTML() {
+    const profile = DB.userProfile;
     return `
       <div class="view-section active">
-        <span class="section-subtitle">My Journey</span>
-        <h3 class="section-title">Activity Dashboard</h3>
-        <p class="section-desc">Your local history, goals, territory stamps, and unlocked badges.</p>
+        <span class="section-subtitle">My Journey & Cloud Sync</span>
+        <h3 class="section-title">${profile.username}'s Dashboard</h3>
+        <p class="section-desc">Cloud-synced profile, personal preferences, and unlocked achievements.</p>
+
+        <div class="card" style="border-color:var(--accent-lime);">
+          <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">⚙️ Personalization Settings</h4>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Customize your Addis Active experience.</p>
+          <div style="display:flex; flex-direction:column; gap:0.75rem; font-size:0.85rem;">
+            <div style="display:flex; justify-content:space-between; background:#181818; padding:0.75rem; border-radius:6px;">
+              <span style="color:var(--text-muted);">Primary Activity</span>
+              <span style="font-family:var(--font-tech); color:var(--accent-lime); text-transform:uppercase;">${profile.primaryActivity}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; background:#181818; padding:0.75rem; border-radius:6px;">
+              <span style="color:var(--text-muted);">Fitness Level</span>
+              <span style="font-family:var(--font-tech); color:var(--text-primary);">${profile.fitnessLevel}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; background:#181818; padding:0.75rem; border-radius:6px;">
+              <span style="color:var(--text-muted);">Cloud Sync Status</span>
+              <span style="font-family:var(--font-tech); color:var(--accent-lime);">Connected (Local Supabase Mock)</span>
+            </div>
+          </div>
+        </div>
 
         <div class="card">
           <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">Territory Stamps & Exploration</h4>
-          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">Collect stamps by exploring city districts.</p>
           <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:0.75rem; margin-top:0.75rem;">
             ${DB.territories.map(t => `
               <div style="background:#181818; border:1px solid ${t.status === 'UNLOCKED' ? 'var(--accent-lime)' : 'var(--border-color)'}; padding:0.75rem; border-radius:8px;">
@@ -433,11 +453,6 @@ class AddisActiveApp {
               </div>
             `).join('')}
           </div>
-        </div>
-
-        <div class="card">
-          <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">Saved Activities</h4>
-          <p style="font-size:0.85rem; color:var(--text-dim);">Completed GPS sessions will appear here.</p>
         </div>
       </div>
     `;
