@@ -12,6 +12,7 @@ class AddisActiveApp {
     this.routeCoordinates = [];
     this.mapInstance = null;
     this.polylineInstance = null;
+    this.currentExploreFilter = 'all';
     this.init();
   }
 
@@ -93,6 +94,23 @@ class AddisActiveApp {
     detailModal?.addEventListener('click', (e) => {
       if (e.target === detailModal) detailModal.classList.remove('active');
     });
+
+    // Global delegation for explore details & filters so they never unbind
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('route-detail-btn')) {
+        const id = e.target.getAttribute('data-id');
+        this.showRouteDetails(id);
+      }
+      if (e.target.classList.contains('filter-chip')) {
+        const filter = e.target.getAttribute('data-filter');
+        this.currentExploreFilter = filter;
+        const main = document.getElementById('appMain');
+        if (main) {
+          const wrapper = main.querySelector('.view-section');
+          if (wrapper) wrapper.innerHTML = this.getExploreHTML(filter);
+        }
+      }
+    });
   }
 
   renderView(viewName) {
@@ -119,7 +137,7 @@ class AddisActiveApp {
 
     switch(viewName) {
       case 'home': wrapper.innerHTML = this.getHomeHTML(); this.bindHomeEvents(); break;
-      case 'explore': wrapper.innerHTML = this.getExploreHTML('all'); this.bindExploreEvents(); break;
+      case 'explore': wrapper.innerHTML = this.getExploreHTML(this.currentExploreFilter); break;
       case 'activity': wrapper.innerHTML = this.getActivityTrackerHTML(); this.bindTrackerEvents(); break;
       case 'community': wrapper.innerHTML = this.getCommunityHTML(); break;
       case 'profile': wrapper.innerHTML = this.getProfileHTML(); this.bindProfileEvents(); break;
@@ -198,12 +216,10 @@ class AddisActiveApp {
   bindHomeEvents() {
     document.getElementById('heroExploreBtn')?.addEventListener('click', () => this.renderView('explore'));
     document.getElementById('heroTrackBtn')?.addEventListener('click', () => this.renderView('activity'));
-    document.querySelectorAll('.route-detail-btn').forEach(btn => {
-      btn.addEventListener('click', () => { this.showRouteDetails(btn.getAttribute('data-id')); });
-    });
   }
 
   getExploreHTML(filter) {
+    this.currentExploreFilter = filter;
     const allRoutes = this.getSortedRoutes();
     const routes = filter === 'all' ? allRoutes : allRoutes.filter(r => r.activity === filter);
 
@@ -228,7 +244,7 @@ class AddisActiveApp {
           <div class="card" style="margin-bottom:0; display:flex; flex-direction:column; justify-content:space-between;">
             <div>
               <div style="background:#1a1a1a; padding:0.75rem; border-radius:8px; border:1px solid #282828; margin-bottom:0.75rem; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:0.85rem; font-weight:600;">📺 Watch Before You Go: ${r.videoTitle}</span>
+                <span style="font-size:0.85rem; font-weight:600;">📺 Watch: ${r.videoTitle}</span>
                 <span class="badge">⏱️ ${r.videoDuration}</span>
               </div>
               <span class="badge">${DB.activitiesMeta[r.activity]?.icon || '📍'} ${r.activity.toUpperCase()} •${r.area}</span>
@@ -241,24 +257,6 @@ class AddisActiveApp {
         `).join('')}
       </div>
     `;
-  }
-
-  bindExploreEvents() {
-    document.querySelectorAll('.filter-chip').forEach(chip => {
-      chip.addEventListener('click', (e) => {
-        const filter = e.target.getAttribute('data-filter');
-        const main = document.getElementById('appMain');
-        if (main) {
-          const wrapper = main.querySelector('.view-section');
-          if (wrapper) wrapper.innerHTML = this.getExploreHTML(filter);
-          this.bindExploreEvents();
-        }
-      });
-    });
-
-    document.querySelectorAll('.route-detail-btn').forEach(btn => {
-      btn.addEventListener('click', () => { this.showRouteDetails(btn.getAttribute('data-id')); });
-    });
   }
 
   showRouteDetails(routeId) {
@@ -300,7 +298,7 @@ class AddisActiveApp {
       <p class="section-desc">Define your activity type before starting your local GPS session.</p>
       <div class="tracker-card">
         <div style="margin-bottom:1rem; text-align:left;">
-          <label style="font-size:0.75rem; font-family:var(--font-tech); color:var(--text-muted);">SELECT ACTIVITY TYPE</label>
+          <label style="font-size:0.75rem; font-family:var(--font-tech); color:var(--text-muted);">ACTIVE SESSION TYPE</label>
           <select id="trackerActivityType" style="width:100%; background:#181818; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:8px; margin-top:0.3rem;">
             <option value="run">Running 🏃</option>
             <option value="walk">Walking 🚶</option>
@@ -312,6 +310,7 @@ class AddisActiveApp {
           </select>
         </div>
 
+        <div id="activeActivityBadge" style="margin-bottom:1rem; font-family:var(--font-tech); font-size:0.8rem; color:var(--accent-lime);"></div>
         <div id="timerDisplay" class="timer-display">00:00:00</div>
         <div class="metrics-row">
           <div class="metric-box"><div id="distDisplay" class="m-val">0.00</div><div class="m-lbl">Kilometers</div></div>
@@ -331,9 +330,15 @@ class AddisActiveApp {
     const startBtn = document.getElementById('startTrackBtn');
     const stopBtn = document.getElementById('stopTrackBtn');
     const activitySelect = document.getElementById('trackerActivityType');
+    const badgeDiv = document.getElementById('activeActivityBadge');
 
     startBtn?.addEventListener('click', () => {
-      if (activitySelect) activitySelect.disabled = true;
+      if (activitySelect) {
+        activitySelect.disabled = true;
+        const selectedVal = activitySelect.value;
+        const meta = DB.activitiesMeta[selectedVal] || { title: selectedVal, icon: '⚡' };
+        if (badgeDiv) badgeDiv.innerText = `🟢 TRACKING ACTIVE: ${meta.title.toUpperCase()} ${meta.icon}`;
+      }
       startBtn.style.display = 'none';
       if (stopBtn) stopBtn.style.display = 'block';
       this.startGPSession();
@@ -342,6 +347,7 @@ class AddisActiveApp {
     stopBtn?.addEventListener('click', () => {
       this.stopGPSession();
       if (activitySelect) activitySelect.disabled = false;
+      if (badgeDiv) badgeDiv.innerText = '';
       if (DB.userProfile) {
         DB.userProfile.xp += 100;
         if (DB.userProfile.xp >= 150) DB.userProfile.level = 2;
