@@ -15,24 +15,14 @@ class AddisActiveApp {
   }
 
   init() {
-    this.checkOnlineStatus();
     this.setupEventListeners();
     this.renderView('home');
-  }
 
-  checkOnlineStatus() {
-    const banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-    const updateStatus = () => {
-      if (navigator.onLine) {
-        banner.style.display = 'none';
-      } else {
-        banner.style.display = 'block';
-      }
-    };
-    window.addEventListener('online', updateStatus);
-    window.addEventListener('offline', updateStatus);
-    updateStatus();
+    // Dismiss native splash screen after load
+    setTimeout(() => {
+      const splash = document.getElementById('splashScreen');
+      if (splash) splash.classList.add('fade-out');
+    }, 600);
   }
 
   setupEventListeners() {
@@ -55,15 +45,14 @@ class AddisActiveApp {
     const searchClose = document.getElementById('searchClose');
     const searchInput = document.getElementById('globalSearchInput');
 
-    if (searchTrigger && searchModal) {
-      searchTrigger.addEventListener('click', () => searchModal.classList.add('active'));
-    }
-    if (searchClose && searchModal) {
-      searchClose.addEventListener('click', () => searchModal.classList.remove('active'));
-    }
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => this.handleGlobalSearch(e.target.value));
-    }
+    if (searchTrigger && searchModal) searchTrigger.addEventListener('click', () => searchModal.classList.add('active'));
+    if (searchClose && searchModal) searchClose.addEventListener('click', () => searchModal.classList.remove('active'));
+    if (searchInput) searchInput.addEventListener('input', (e) => this.handleGlobalSearch(e.target.value));
+
+    const detailModal = document.getElementById('detailModal');
+    detailModal?.addEventListener('click', (e) => {
+      if (e.target === detailModal) detailModal.classList.remove('active');
+    });
   }
 
   renderView(viewName) {
@@ -71,41 +60,21 @@ class AddisActiveApp {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     document.querySelectorAll('.nav-tab').forEach(tab => {
-      if (tab.getAttribute('data-target') === viewName) {
-        tab.classList.add('active');
-      } else {
-        tab.classList.remove('active');
-      }
+      if (tab.getAttribute('data-target') === viewName) tab.classList.add('active');
+      else tab.classList.remove('active');
     });
 
     const main = document.getElementById('appMain');
     if (!main) return;
 
     switch(viewName) {
-      case 'home':
-        main.innerHTML = this.getHomeHTML();
-        this.bindHomeEvents();
-        break;
-      case 'explore':
-        main.innerHTML = this.getExploreHTML('all');
-        this.bindExploreEvents();
-        break;
-      case 'videos':
-        main.innerHTML = this.getVideosHTML();
-        break;
-      case 'activity':
-        main.innerHTML = this.getActivityTrackerHTML();
-        this.bindTrackerEvents();
-        break;
-      case 'events':
-        main.innerHTML = this.getEventsHTML();
-        break;
-      case 'profile':
-        main.innerHTML = this.getProfileHTML();
-        this.bindProfileEvents();
-        break;
-      default:
-        main.innerHTML = this.getHomeHTML();
+      case 'home': main.innerHTML = this.getHomeHTML(); this.bindHomeEvents(); break;
+      case 'explore': main.innerHTML = this.getExploreHTML('all'); this.bindExploreEvents(); break;
+      case 'videos': main.innerHTML = this.getVideosHTML(); break;
+      case 'activity': main.innerHTML = this.getActivityTrackerHTML(); this.bindTrackerEvents(); break;
+      case 'events': main.innerHTML = this.getEventsHTML(); break;
+      case 'profile': main.innerHTML = this.getProfileHTML(); this.bindProfileEvents(); break;
+      default: main.innerHTML = this.getHomeHTML();
     }
   }
 
@@ -114,13 +83,10 @@ class AddisActiveApp {
     return `
       <div class="view-section active">
         <div class="hero-box">
-          <div class="location-tag">
-            <span class="brand-dot"></span>
-            <span>ADDIS ABABA • 2,355M ALTITUDE</span>
-          </div>
+          <div class="location-tag"><span class="brand-dot"></span><span>ADDIS ABABA • 2,355M ALTITUDE</span></div>
           <h2 class="hero-title">WELCOME BACK, ${profile.username.toUpperCase()}</h2>
           <p class="hero-tagline">FAVORITE ZONE: ${profile.homeArea.toUpperCase()}</p>
-          <p class="hero-desc">Your personalized active engine is tuned for ${profile.primaryActivity} sessions across Addis Ababa.</p>
+          <p class="hero-desc">Your active engine is tuned for ${profile.primaryActivity} across Addis parks & corridors.</p>
           <div class="hero-btns">
             <button class="btn btn-primary" id="heroExploreBtn">Explore Addis</button>
             <button class="btn btn-outline" id="heroTrackBtn">Start Activity</button>
@@ -130,10 +96,10 @@ class AddisActiveApp {
         <div class="card">
           <span class="section-subtitle">AI Addis Coach</span>
           <h3 class="section-title">Ask Your Trainer</h3>
-          <p class="section-desc">Tap a question below for instant localized guidance on altitude and pacing.</p>
-          <div style="display:flex; flex-direction:column; gap:0.5rem;" id="aiCoachBox">
+          <p class="section-desc">Tap a question below for instant localized guidance.</p>
+          <div style="display:flex; flex-direction:column; gap:0.5rem;">
             ${DB.aiCoachPrompts.map((p, idx) => `
-              <div class="ai-prompt-card" data-idx="${idx}" style="background:#181818; padding:0.75rem 1rem; border-radius:8px; border:1px solid #222; cursor:pointer;">
+              <div class="ai-prompt-card" data-idx="${idx}" style="background:#181818; padding:0.75rem 1rem; border-radius:10px; border:1px solid #222; cursor:pointer;">
                 <div style="font-size:0.9rem; font-weight:600; color:var(--accent-lime);">💡 ${p.q}</div>
                 <div class="ai-ans" style="display:none; font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem; border-top:1px solid #333; padding-top:0.5rem;">${p.a}</div>
               </div>
@@ -147,13 +113,10 @@ class AddisActiveApp {
   bindHomeEvents() {
     document.getElementById('heroExploreBtn')?.addEventListener('click', () => this.renderView('explore'));
     document.getElementById('heroTrackBtn')?.addEventListener('click', () => this.renderView('activity'));
-    
     document.querySelectorAll('.ai-prompt-card').forEach(card => {
       card.addEventListener('click', () => {
         const ans = card.querySelector('.ai-ans');
-        if (ans) {
-          ans.style.display = ans.style.display === 'block' ? 'none' : 'block';
-        }
+        if (ans) ans.style.display = ans.style.display === 'block' ? 'none' : 'block';
       });
     });
   }
@@ -163,28 +126,31 @@ class AddisActiveApp {
     return `
       <div class="view-section active">
         <span class="section-subtitle">Explore Addis</span>
-        <h3 class="section-title">Routes & Parks</h3>
-        <p class="section-desc">Verified trails, tarmac loops, and active spaces across the city.</p>
+        <h3 class="section-title">Corridors, Parks & Trails</h3>
+        <p class="section-desc">Verified routes and active spaces across Addis Ababa.</p>
         
         <div class="filter-bar">
           <button class="filter-chip ${filter === 'all' ? 'active':''}" data-filter="all">All</button>
           <button class="filter-chip ${filter === 'run' ? 'active':''}" data-filter="run">Run</button>
           <button class="filter-chip ${filter === 'hike' ? 'active':''}" data-filter="hike">Hike</button>
+          <button class="filter-chip ${filter === 'walk' ? 'active':''}" data-filter="walk">Walk</button>
         </div>
 
         <div id="mapContainer"></div>
 
         <div class="grid-2" style="margin-top:1rem;">
           ${routes.map(r => `
-            <div class="card" style="margin-bottom:0;">
-              <span class="badge">${r.activity} •${r.area}</span>
-              <h4 style="font-family:var(--font-display); font-size:1.1rem; margin:0.4rem 0;">${r.name}</h4>
-              <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">${r.desc}</p>
-              <div style="display:flex; justify-content:space-between; font-family:var(--font-tech); font-size:0.75rem; color:var(--accent-lime); margin-bottom:1rem;">
-                <span>📏 ${r.distance}</span>
-                <span>⚡ ${r.elevation}</span>
+            <div class="card" style="margin-bottom:0; display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <span class="badge">${r.activity} •${r.area}</span>
+                <h4 style="font-family:var(--font-display); font-size:1.1rem; margin:0.4rem 0;">${r.name}</h4>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem;">${r.desc}</p>
+                <div style="display:flex; justify-content:space-between; font-family:var(--font-tech); font-size:0.75rem; color:var(--accent-lime); margin-bottom:1rem;">
+                  <span>📏 ${r.distance}</span>
+                  <span>⚡ ${r.elevation}</span>
+                </div>
               </div>
-              <button class="btn btn-outline btn-full btn-sm" onclick="alert('Route selected: ${r.name}')">View Route Details</button>
+              <button class="btn btn-outline btn-full btn-sm route-detail-btn" data-id="${r.id}">View Route Details</button>
             </div>
           `).join('')}
         </div>
@@ -202,15 +168,58 @@ class AddisActiveApp {
       });
     });
 
+    document.querySelectorAll('.route-detail-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        this.showRouteDetails(id);
+      });
+    });
+
     setTimeout(() => {
       if (typeof L !== 'undefined' && document.getElementById('mapContainer')) {
         const map = L.map('mapContainer').setView([9.0300, 38.7400], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '© OpenStreetMap'
-        }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+        DB.routes.forEach(r => {
+          L.marker(r.coords).addTo(map).bindPopup(`<b>${r.name}</b><br>${r.area}`);
+        });
       }
     }, 150);
+  }
+
+  showRouteDetails(routeId) {
+    const r = DB.routes.find(x => x.id === routeId);
+    if (!r) return;
+    const modal = document.getElementById('detailModal');
+    const content = document.getElementById('detailModalContent');
+    if (!modal || !content) return;
+
+    content.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <span class="badge">${r.activity} • ${r.area}</span>
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('detailModal').classList.remove('active')">✕ Close</button>
+      </div>
+      <h3 style="font-family:var(--font-display); font-size:1.4rem; margin-bottom:0.5rem;">${r.name}</h3>
+      <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1rem;">${r.desc}</p>
+      
+      <div style="background:#181818; padding:1rem; border-radius:10px; margin-bottom:1rem; font-size:0.85rem; display:flex; flex-direction:column; gap:0.5rem;">
+        <div>📏 <strong>Distance:</strong> ${r.distance}</div>
+        <div>⚡ <strong>Elevation:</strong> ${r.elevation}</div>
+        <div>🧭 <strong>Surface:</strong> ${r.surface}</div>
+        <div>📍 <strong>Start Point:</strong> ${r.startingPoint}</div>
+      </div>
+
+      <h4 style="font-family:var(--font-display); font-size:1rem; margin-bottom:0.5rem;">Facilities & Amenities</h4>
+      <div style="display:flex; flex-direction:column; gap:0.4rem; font-size:0.85rem; margin-bottom:1.25rem;">
+        ${r.facilities.map(f => `<div style="background:#181818; padding:0.5rem 0.75rem; border-radius:8px; color:var(--text-muted);">✓ ${f}</div>`).join('')}
+      </div>
+
+      <div style="background:rgba(204,255,0,0.1); border:1px solid rgba(204,255,0,0.3); padding:0.85rem; border-radius:10px; font-size:0.85rem; margin-bottom:1.25rem;">
+        ${r.communityNotes}
+      </div>
+
+      <button class="btn btn-primary btn-full" onclick="alert('Route saved to your profile favorites!'); document.getElementById('detailModal').classList.remove('active');">⭐ Save Route to Favorites</button>
+    `;
+    modal.classList.add('active');
   }
 
   getVideosHTML() {
@@ -245,20 +254,11 @@ class AddisActiveApp {
         <div class="tracker-card">
           <div id="timerDisplay" class="timer-display">00:00:00</div>
           <div class="metrics-row">
-            <div class="metric-box">
-              <div id="distDisplay" class="m-val">0.00</div>
-              <div class="m-lbl">Kilometers</div>
-            </div>
-            <div class="metric-box">
-              <div id="paceDisplay" class="m-val">0:00</div>
-              <div class="m-lbl">Pace /km</div>
-            </div>
-            <div class="metric-box">
-              <div id="gpsStatus" class="m-val" style="font-size:1rem; color:var(--accent-lime);">Ready</div>
-              <div class="m-lbl">GPS Status</div>
-            </div>
+            <div class="metric-box"><div id="distDisplay" class="m-val">0.00</div><div class="m-lbl">Kilometers</div></div>
+            <div class="metric-box"><div id="paceDisplay" class="m-val">0:00</div><div class="m-lbl">Pace /km</div></div>
+            <div class="metric-box"><div id="gpsStatus" class="m-val" style="font-size:1rem; color:var(--accent-lime);">Ready</div><div class="m-lbl">GPS Status</div></div>
           </div>
-          <div id="trackerMap" style="height:200px; width:100%; border-radius:8px; margin-bottom:1rem; background:#111;"></div>
+          <div id="trackerMap" style="height:200px; width:100%; border-radius:10px; margin-bottom:1rem; background:#111;"></div>
           <div style="display:flex; gap:0.5rem;">
             <button id="startTrackBtn" class="btn btn-primary btn-full">Start Session</button>
             <button id="stopTrackBtn" class="btn btn-outline" style="display:none; color:var(--danger-red); border-color:var(--danger-red);">Finish</button>
@@ -287,10 +287,7 @@ class AddisActiveApp {
     setTimeout(() => {
       if (typeof L !== 'undefined' && document.getElementById('trackerMap')) {
         this.mapInstance = L.map('trackerMap').setView([9.0300, 38.7400], 14);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '© OpenStreetMap'
-        }).addTo(this.mapInstance);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(this.mapInstance);
       }
     }, 150);
   }
@@ -382,9 +379,9 @@ class AddisActiveApp {
             <h4 style="font-family:var(--font-display); font-size:1.1rem;">🎯 Personal Goals</h4>
             <button class="btn btn-primary btn-sm" id="addGoalBtn">+ Add Goal</button>
           </div>
-          <div style="display:flex; flex-direction:column; gap:0.75rem;" id="goalsListContainer">
+          <div style="display:flex; flex-direction:column; gap:0.75rem;">
             ${profile.activeGoals.map(g => `
-              <div style="background:#181818; padding:0.85rem; border-radius:8px; border:1px solid #222;">
+              <div style="background:#181818; padding:0.85rem; border-radius:10px; border:1px solid #222;">
                 <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.9rem; margin-bottom:0.3rem;">
                   <span>${g.title}</span>
                   <span style="font-family:var(--font-tech); color:var(--accent-lime);">${g.progress} /${g.target}</span>
@@ -399,7 +396,7 @@ class AddisActiveApp {
           <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">Territory Stamps</h4>
           <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:0.75rem; margin-top:0.75rem;">
             ${DB.territories.map(t => `
-              <div style="background:#181818; border:1px solid ${t.status === 'UNLOCKED' ? 'var(--accent-lime)' : 'var(--border-color)'}; padding:0.75rem; border-radius:8px;">
+              <div style="background:#181818; border:1px solid ${t.status === 'UNLOCKED' ? 'var(--accent-lime)' : 'var(--border-color)'}; padding:0.75rem; border-radius:10px;">
                 <div style="font-size:1.5rem; margin-bottom:0.2rem;">${t.icon}</div>
                 <div style="font-family:var(--font-display); font-size:0.9rem; font-weight:700;">${t.name}</div>
                 <div style="font-family:var(--font-tech); font-size:0.65rem; color:${t.status === 'UNLOCKED' ? 'var(--accent-lime)' : 'var(--text-dim)'}; margin-top:0.2rem;">${t.status}</div>
@@ -413,7 +410,7 @@ class AddisActiveApp {
 
   bindProfileEvents() {
     document.getElementById('addGoalBtn')?.addEventListener('click', () => {
-      const title = prompt('Enter new goal title (e.g., Weekend Morning Run):');
+      const title = prompt('Enter new goal title:');
       if (title) {
         DB.userProfile.activeGoals.push({ id: 'g' + Date.now(), title, target: '10 KM', progress: '0 KM', status: 'In Progress' });
         this.renderView('profile');
@@ -429,8 +426,12 @@ class AddisActiveApp {
       return;
     }
     const q = query.toLowerCase();
-    const matches = DB.routes.filter(r => r.name.toLowerCase().includes(q));
-    res.innerHTML = matches.length ? matches.map(r => `<div class="search-result-item" onclick="alert('${r.name}')">${r.name}</div>`).join('') : '<p class="search-hint">No results found.</p>';
+    const matches = DB.routes.filter(r => r.name.toLowerCase().includes(q) || r.area.toLowerCase().includes(q));
+    res.innerHTML = matches.length ? matches.map(r => `
+      <div class="search-result-item" onclick="document.getElementById('searchModal').classList.remove('active'); window.app.showRouteDetails('${r.id}');">
+        <strong>${r.name}</strong> (${r.area})
+      </div>
+    `).join('') : '<p class="search-hint">No results found.</p>';
   }
 }
 
