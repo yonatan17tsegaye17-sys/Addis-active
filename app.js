@@ -95,7 +95,7 @@ class AddisActiveApp {
       if (e.target === detailModal) detailModal.classList.remove('active');
     });
 
-    // Bulletproof Global Event Delegation for Explore Filters & Route Details
+    // Global Event Delegation ensuring Explore filters and route details always work
     document.addEventListener('click', (e) => {
       const detailBtn = e.target.closest('.route-detail-btn');
       if (detailBtn) {
