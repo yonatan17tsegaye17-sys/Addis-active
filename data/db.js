@@ -1,116 +1,65 @@
 export const DB = {
   version: "1.0.0-beta",
-  userProfile: {
-    username: 'Addis Runner',
-    homeArea: 'Bole / Edna Mall',
-    primaryActivity: 'run',
-    fitnessLevel: 'Recreational',
-    totalDistanceLogged: '14.5 KM',
-    activeGoals: [
-      { id: 'g1', title: 'Complete First 5K', target: '5 KM', progress: '3.2 KM', status: 'In Progress' },
-      { id: 'g2', title: 'Entoto Ridge Hike', target: '10.5 KM', progress: '0 KM', status: 'Not Started' }
-    ]
-  },
+  userProfile: null, // Populated via onboarding signup
   aiCoachPrompts: [
     { q: 'How do I handle running at 2,355m altitude in Addis?', a: 'Start slower than your usual pace by 20–30 seconds per kilometer. Hydrate early and let your cardiovascular system adjust.' },
     { q: 'Where are the best corridor paths and parks?', a: 'Unity Park, Sheger Riverside Park, Churchill Avenue corridor, and Entoto Natural Park offer pristine walking and running paths.' }
   ],
+  activitiesMeta: {
+    run: { title: 'Running', icon: '🏃', desc: 'From sunrise tarmac loops to high-altitude endurance engines.' },
+    walk: { title: 'Walking', icon: '🚶', desc: 'Urban promenades, green parks, and community stride sessions.' },
+    bike: { title: 'Cycling', icon: '🚴', desc: 'Road rides, mountain climbs, and urban group cycling.' },
+    swim: { title: 'Swimming', icon: '🏊', desc: 'Pool facilities, aquatic training, and fitness laps.' },
+    hike: { title: 'Hiking', icon: '🥾', desc: 'Mountain trails, eucalyptus forests, and ridge scrambles.' },
+    football: { title: 'Football', icon: '⚽', desc: 'Pitch matches, turf fields, and community games.' },
+    fitness: { title: 'Fitness', icon: '🏋️', desc: 'Outdoor workouts, strength conditioning, and functional movement.' }
+  },
   routes: [
-    {
-      id: 'r1',
-      name: 'Entoto Forest Ridge Loop',
-      activity: 'hike',
-      area: 'Entoto Mountain',
-      distance: '10.5 KM',
-      elevation: '+340m Gain',
-      difficulty: 'Challenging',
-      estimatedTime: '1h 45m',
-      startingPoint: 'Entoto Natural Park Gate 1',
-      level: 'Advanced',
-      surface: 'Trail / Loose Gravel & Eucalyptus Canopy',
-      facilities: ['Parking: Available', 'Restrooms: Gate 1 & Summit', 'Water: Stations at Gate', 'Lighting: Daylight Only'],
-      desc: 'High-altitude trail winding through dense eucalyptus canopy with sweeping panoramas of Addis Ababa.',
-      communityNotes: '“Bring hydration and watch your footing on loose gravel.” — Bertusew Community',
-      image: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80',
-      coords: [9.0765, 38.7421]
-    },
-    {
-      id: 'r2',
-      name: 'Bole Boulevard Sunrise Tarmac',
-      activity: 'run',
-      area: 'Bole / Edna Mall',
-      distance: '5.2 KM',
-      elevation: '+45m Gain',
-      difficulty: 'Moderate',
-      estimatedTime: '30m',
-      startingPoint: 'Edna Mall Main Junction',
-      level: 'Recreational',
-      surface: 'Smooth Urban Tarmac & Paved Sidewalks',
-      facilities: ['Parking: Street / Mall', 'Restrooms: Commercial Hubs', 'Water: Cafes & Shops', 'Lighting: Excellent Streetlights'],
-      desc: 'Smooth urban tarmac stretch featuring wide sidewalks, perfect for early morning tempo runs.',
-      communityNotes: '“Best run right at 6:00 AM when the air is cool and traffic is low.”',
-      image: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80',
-      coords: [9.0192, 38.7890]
-    },
-    {
-      id: 'r3',
-      name: 'Unity Park & Palace Grounds Stride',
-      activity: 'walk',
-      area: 'Arat Kilo / Grand Palace',
-      distance: '3.8 KM',
-      elevation: '+20m Gain',
-      difficulty: 'Easy',
-      estimatedTime: '45m',
-      startingPoint: 'Unity Park Main Gate',
-      level: 'All Levels',
-      surface: 'Paved Stone Walkways & Landscaped Gardens',
-      facilities: ['Parking: Secure Gate', 'Restrooms: Inside Park', 'Water: Kiosks', 'Lighting: Full Park Lighting'],
-      desc: 'Scenic historic walk through beautifully restored palace grounds, indigenous greenery, and exhibition spaces.',
-      communityNotes: '“Wonderful weekend family walking environment.”',
-      image: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80',
-      coords: [9.0250, 38.7570]
-    },
-    {
-      id: 'r4',
-      name: 'Churchill Avenue & Riverside Corridor',
-      activity: 'run',
-      area: 'Churchill Ave / City Center',
-      distance: '6.0 KM',
-      elevation: '+30m Gain',
-      difficulty: 'Moderate',
-      estimatedTime: '35m',
-      startingPoint: 'Taitu Hotel Junction',
-      level: 'Intermediate',
-      surface: 'New Asphalt Corridor & Riverside Walkway',
-      facilities: ['Parking: Public Lots', 'Restrooms: Public Plazas', 'Water: Available Along Corridor', 'Lighting: Modern LED Streetlights'],
-      desc: 'Newly revamped urban corridor featuring wide pedestrian walkways, greenery, and smooth running tarmac.',
-      communityNotes: '“Part of the new Addis Ababa corridor transformation project.”',
-      image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
-      coords: [9.0120, 38.7520]
-    }
+    { id: 'r1', name: 'Entoto Forest Ridge Loop', activity: 'hike', area: 'Entoto Mountain', distance: '10.5 KM', elevation: '+340m Gain', difficulty: 'Challenging', estimatedTime: '1h 45m', startingPoint: 'Entoto Gate 1', surface: 'Trail / Loose Gravel', facilities: ['Parking', 'Restrooms', 'Water'], desc: 'High-altitude trail winding through eucalyptus canopy.', communityNotes: 'Bring hydration.', coords: [9.0765, 38.7421], image: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r2', name: 'Bole Boulevard Sunrise Tarmac', activity: 'run', area: 'Bole', distance: '5.2 KM', elevation: '+45m Gain', difficulty: 'Moderate', estimatedTime: '30m', startingPoint: 'Edna Mall', surface: 'Smooth Asphalt', facilities: ['Parking', 'Restrooms', 'Cafes'], desc: 'Smooth urban stretch featuring wide sidewalks.', communityNotes: 'Best run at 6 AM.', coords: [9.0192, 38.7890], image: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r3', name: 'Unity Park & Palace Grounds', activity: 'walk', area: 'Arat Kilo', distance: '3.8 KM', elevation: '+20m Gain', difficulty: 'Easy', estimatedTime: '45m', startingPoint: 'Unity Gate', surface: 'Paved Walkways', facilities: ['Restrooms', 'Water Kiosks'], desc: 'Scenic historic walk through restored palace grounds.', communityNotes: 'Great family walk.', coords: [9.0250, 38.7570], image: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r4', name: 'Churchill Avenue Corridor', activity: 'run', area: 'City Center', distance: '6.0 KM', elevation: '+30m Gain', difficulty: 'Moderate', estimatedTime: '35m', startingPoint: 'Taitu Hotel', surface: 'New Asphalt', facilities: ['Public Plazas', 'LED Lighting'], desc: 'Newly revamped urban corridor with wide pedestrian walks.', communityNotes: 'Part of corridor project.', coords: [9.0120, 38.7520], image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r5', name: 'Meskel Square Stadium Loop', activity: 'run', area: 'Meskel Square', distance: '3.0 KM', elevation: '+15m Gain', difficulty: 'Easy', estimatedTime: '20m', startingPoint: 'Stadium Gate', surface: 'Tarmac & Rubber Track', facilities: ['Parking', 'Restrooms'], desc: 'Historic heart of Ethiopian running culture.', communityNotes: 'Busy in evenings.', coords: [9.0105, 38.7612], image: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r6', name: 'Sheger Riverside Promenade', activity: 'walk', area: 'Arat Kilo to Kazanchis', distance: '7.5 KM', elevation: '+50m Gain', difficulty: 'Moderate', estimatedTime: '1h 10m', startingPoint: 'Friendship Park', surface: 'Paved Stone & Wood Deck', facilities: ['Restrooms', 'Water Stations', 'Cafes'], desc: 'Lush riverside walkway cutting through central Addis.', communityNotes: 'Beautiful sunset stroll.', coords: [9.0180, 38.7650], image: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r7', name: 'Friendship Park Lake Loop', activity: 'walk', area: 'Sidist Kilo', distance: '2.5 KM', elevation: '+10m Gain', difficulty: 'Easy', estimatedTime: '30m', startingPoint: 'Main Fountain', surface: 'Interlocking Bricks', facilities: ['Restrooms', 'Security', 'Lighting'], desc: 'Calm garden paths around central water fountains.', communityNotes: 'Family friendly.', coords: [9.0220, 38.7600], image: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r8', name: 'Bole Medhane Alem Circuit', activity: 'run', area: 'Bole', distance: '4.0 KM', elevation: '+25m Gain', difficulty: 'Moderate', estimatedTime: '25m', startingPoint: 'Medhane Alem Church', surface: 'Urban Pavement', facilities: ['Shops', 'Parking'], desc: 'Vibrant commercial district running loop.', communityNotes: 'Watch for foot traffic.', coords: [9.0150, 38.7900], image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r9', name: 'CMC Residential Stride', activity: 'run', area: 'CMC', distance: '6.5 KM', elevation: '+60m Gain', difficulty: 'Moderate', estimatedTime: '40m', startingPoint: 'CMC Square', surface: 'Asphalt Roads', facilities: ['Quiet Streets', 'Shops'], desc: 'Quiet suburban residential tarmac roads.', communityNotes: 'Great low traffic loop.', coords: [9.0250, 38.8500], image: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r10', name: 'Sarbet Diplomatic Quarter Loop', activity: 'walk', area: 'Sarbet', distance: '5.0 KM', elevation: '+40m Gain', difficulty: 'Easy', estimatedTime: '50m', startingPoint: 'British Embassy Gate', surface: 'Tree-lined Pavement', facilities: ['Security', 'Quiet Paths'], desc: 'Shaded walking paths through international embassy zones.', communityNotes: 'Very peaceful.', coords: [8.9950, 38.7300], image: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r11', name: 'Bole Atlas Sprint Track', activity: 'run', area: 'Atlas', distance: '3.5 KM', elevation: '+20m Gain', difficulty: 'Moderate', estimatedTime: '20m', startingPoint: 'Atlas Hotel', surface: 'Tarmac', facilities: ['Cafes', 'Streetlights'], desc: 'Fast flat running loop around Atlas commercial blocks.', communityNotes: 'Great night running zone.', coords: [9.0125, 38.7850], image: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r12', name: 'Piassa Historic Walk', activity: 'walk', name: 'Piassa Historic Walk', activity: 'walk', area: 'Piassa', distance: '4.2 KM', elevation: '+55m Gain', difficulty: 'Moderate', estimatedTime: '45m', startingPoint: 'Ethio-Chess', surface: 'Historic Stone Pavement', facilities: ['Cafes', 'Historic Sites'], desc: 'Explore vintage Italian-era architecture and coffee shops.', communityNotes: 'Busy historic district.', coords: [9.0320, 38.7500], image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r13', name: 'Sidist Kilo Campus Loop', activity: 'run', area: 'Sidist Kilo', distance: '4.8 KM', elevation: '+70m Gain', difficulty: 'Challenging', estimatedTime: '30m', startingPoint: 'AAU Main Gate', surface: 'Hilly Asphalt', facilities: ['Campus Security', 'Water'], desc: 'Hilly university campus running circuit.', communityNotes: 'Builds great hill endurance.', coords: [9.0370, 38.7550], image: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r14', name: 'Kazanchis Urban Stride', activity: 'walk', area: 'Kazanchis', distance: '4.0 KM', elevation: '+35m Gain', difficulty: 'Easy', estimatedTime: '40m', startingPoint: 'ECA Compound', surface: 'Paved Walkways', facilities: ['Hotels', 'Plazas'], desc: 'Walking route past international conference centers.', communityNotes: 'Well lit at night.', coords: [9.0170, 38.7680], image: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r15', name: 'Jemo Residential Circuit', activity: 'bike', area: 'Jemo', distance: '12.0 KM', elevation: '+90m Gain', difficulty: 'Moderate', estimatedTime: '45m', startingPoint: 'Jemo Square', surface: 'Asphalt Roads', facilities: ['Local Markets', 'Bike Parking'], desc: 'Long suburban cycling route across western Addis.', communityNotes: 'Watch for vehicle traffic.', coords:.8950, 38.7000], image: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r16', name: 'Megenagna Hub Circuit', activity: 'run', area: 'Megenagna', distance: '5.5 KM', elevation: '+45m Gain', difficulty: 'Moderate', estimatedTime: '35m', startingPoint: 'Megenagna Junction', surface: 'Paved Sidewalks', facilities: ['Transit Access', 'Shops'], desc: 'Bustling transit hub perimeter run.', communityNotes: 'Best early morning.', coords: [9.0200, 38.8100], image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r17', name: 'Bole Bulbula Riverside', activity: 'hike', area: 'Bulbula', distance: '8.0 KM', elevation: '+60m Gain', difficulty: 'Moderate', estimatedTime: '1h 15m', startingPoint: 'Bulbula Bridge', surface: 'Dirt & Gravel Path', facilities: ['Open Nature', 'River Views'], desc: 'Scenic nature trail along the Bulbula river basin.', communityNotes: 'Wear trail shoes.', coords: [8.9800, 38.8000], image: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r18', name: 'Ayat Residential Loop', activity: 'run', area: 'Ayat', distance: '7.0 KM', elevation: '+50m Gain', difficulty: 'Moderate', estimatedTime: '40m', startingPoint: 'Ayat Square', surface: 'Smooth Tarmac', facilities: ['Quiet Roads', 'Shops'], desc: 'Outer eastern residential tarmac loop.', communityNotes: 'Clean air and quiet roads.', coords: [9.0300, 38.8700], image: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r19', name: 'Gulele Botanical Gardens Trail', activity: 'hike', area: 'Gulele', distance: '9.5 KM', elevation: '+280m Gain', difficulty: 'Challenging', estimatedTime: '2h 00m', startingPoint: 'Botanical Gate', surface: 'Mountain Trail', facilities: ['Visitor Center', 'Restrooms', 'Parking'], desc: 'High-altitude botanical conservation park trails.', communityNotes: 'Breathtaking plant biodiversity.', coords: [9.0850, 38.7300], image: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80' },
+    { id: 'r20', name: 'Kolfie Ring Road Stride', activity: 'bike', area: 'Kolfie', distance: '14.0 KM', elevation: '+120m Gain', difficulty: 'Advanced', estimatedTime: '55m', startingPoint: 'Kolfie Square', surface: 'Highway Service Lane', facilities: ['Wide Service Road'], desc: 'Long distance cycling circuit along western ring road.', communityNotes: 'High endurance training.', coords: [9.0100, 38.6900], image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80' }
   ],
   videos: [
-    {
-      id: 'v1',
-      title: 'Entoto Mountain Ridge Walkthrough',
-      area: 'Entoto Mountain',
-      duration: '3:45',
-      thumbnail: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80',
-      desc: 'Visual preview of high-altitude eucalyptus trails.'
-    }
+    { id: 'v1', title: 'Entoto Mountain Ridge Walkthrough', area: 'Entoto Mountain', duration: '3:45', thumbnail: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80', desc: 'Visual preview of high-altitude eucalyptus trails.' },
+    { id: 'v2', title: 'Bole Corridor Sunrise Tour', area: 'Bole', duration: '2:30', thumbnail: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80', desc: 'Smooth sidewalks and early morning running conditions.' },
+    { id: 'v3', title: 'Unity Park Gardens Preview', area: 'Arat Kilo', duration: '4:15', thumbnail: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80', desc: 'Tour of historical palace grounds and greenery.' },
+    { id: 'v4', title: 'Churchill Avenue Transformation', area: 'City Center', duration: '3:00', thumbnail: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80', desc: 'Walkthrough of newly revamped pedestrian corridors.' },
+    { id: 'v5', title: 'Meskel Square Evening Vibe', area: 'Meskel Square', duration: '2:10', thumbnail: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80', desc: 'The electric running culture at dusk.' },
+    { id: 'v6', title: 'Sheger Riverside Promenade', area: 'Kazanchis', duration: '5:00', thumbnail: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80', desc: 'A calming journey through central river parks.' },
+    { id: 'v7', title: 'Friendship Park Fountains', area: 'Sidist Kilo', duration: '2:45', thumbnail: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80', desc: 'Water fountain displays and evening leisure walks.' },
+    { id: 'v8', title: 'Bole Atlas Night Life Jog', area: 'Atlas', duration: '3:20', thumbnail: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80', desc: 'Illuminated commercial running circuits.' },
+    { id: 'v9', title: 'CMC Quiet Roads Ride', area: 'CMC', duration: '4:30', thumbnail: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80', desc: 'Suburban cycling routes with clean air.' },
+    { id: 'v10', title: 'Sarbet Embassy Greenways', area: 'Sarbet', duration: '3:15', thumbnail: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80', desc: 'Tree-lined diplomatic walking routes.' },
+    { id: 'v11', title: 'Atlas Commercial Circuit', area: 'Atlas', duration: '2:50', thumbnail: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80', desc: 'Bustling street training sessions.' },
+    { id: 'v12', title: 'Piassa Vintage Architecture', area: 'Piassa', duration: '4:00', thumbnail: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80', desc: 'Historic stone streets and coffee shops.' },
+    { id: 'v13', title: 'Sidist Kilo Campus Hills', area: 'Sidist Kilo', duration: '3:30', thumbnail: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80', desc: 'Steep university hill climbs.' },
+    { id: 'v14', title: 'Kazanchis Conference Hub', area: 'Kazanchis', duration: '2:25', thumbnail: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80', desc: 'Modern plazas and pedestrian walkways.' },
+    { id: 'v15', title: 'Jemo Cycling Tour', area: 'Jemo', duration: '5:10', thumbnail: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80', desc: 'Western suburb cycling routes.' },
+    { id: 'v16', title: 'Megenagna Transit Stride', area: 'Megenagna', duration: '3:05', thumbnail: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80', desc: 'Navigating busy urban transit hubs.' },
+    { id: 'v17', title: 'Bulbula River Basin Trail', area: 'Bulbula', duration: '4:40', thumbnail: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80', desc: 'Nature trails along southern riverbanks.' },
+    { id: 'v18', title: 'Ayat Eastern Tarmac', area: 'Ayat', duration: '3:50', thumbnail: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80', desc: 'Smooth suburban morning running loops.' },
+    { id: 'v19', title: 'Gulele Botanical Forest', area: 'Gulele', duration: '6:00', thumbnail: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80', desc: 'High-altitude botanical park expedition.' },
+    { id: 'v20', title: 'Kolfie Highway Ride', area: 'Kolfie', duration: '4:20', thumbnail: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80', desc: 'Ring road endurance cycling.' }
   ],
   events: [
-    {
-      id: 'e1',
-      title: 'Bertusew Sunday Community Run',
-      activityId: 'run',
-      date: '2026-10-04',
-      startTime: '06:30 AM',
-      location: 'Entoto Park Gate',
-      distance: '5K / 10K',
-      description: 'Steady conversational morning run followed by traditional coffee.',
-      status: 'UPCOMING'
-    }
+    { id: 'e1', title: 'Bertusew Sunday Community Run', activityId: 'run', date: '2026-10-04', startTime: '06:30 AM', location: 'Entoto Park Gate', distance: '5K / 10K', description: 'Steady conversational morning run followed by traditional coffee.', status: 'UPCOMING' }
   ],
   badges: [
     { id: 'b1', name: 'FIRST STEP', icon: '👟', desc: 'Complete your first activity.', unlocked: true },
