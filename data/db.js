@@ -6,8 +6,16 @@ export const DB = {
     primaryActivity: 'run',
     fitnessLevel: 'Recreational',
     totalDistanceLogged: '14.5 KM',
-    activeChallengesCount: 1
+    activeGoals: [
+      { id: 'g1', title: 'Complete First 5K', target: '5 KM', progress: '3.2 KM', status: 'In Progress' },
+      { id: 'g2', title: 'Entoto Ridge Hike', target: '10.5 KM', progress: '0 KM', status: 'Not Started' }
+    ]
   },
+  aiCoachPrompts: [
+    { q: 'How do I handle running at 2,355m altitude in Addis?', a: 'Start slower than your usual pace by 20–30 seconds per kilometer. Hydrate early and let your cardiovascular system adjust over 7–10 days.' },
+    { q: 'Where are the best flat morning routes?', a: 'Bole Boulevard and the new corridor developments offer wide, smooth tarmac surfaces perfect for early morning tempo work.' },
+    { q: 'How should I prepare for Entoto Mountain trails?', a: 'Bring sturdy trail shoes, extra water layers, and prepare for a +340m elevation climb with rewarding panoramic views.' }
+  ],
   activitiesMeta: {
     run: { title: 'Running', icon: '🏃', desc: 'From sunrise tarmac loops to high-altitude endurance engines.' },
     walk: { title: 'Walking', icon: '🚶', desc: 'Urban promenades, green parks, and community stride sessions.' },
@@ -67,16 +75,7 @@ export const DB = {
       duration: '3:45',
       thumbnail: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80',
       embedUrl: 'https://www.youtube.com/embed/K5-GKrUrInI',
-      desc: '[DEMO] Visual preview of the high-altitude eucalyptus trails and panoramic city viewpoints.'
-    },
-    {
-      id: 'v2',
-      title: 'Bole Corridor & Morning Tarmac Tour',
-      area: 'Bole / Edna Mall',
-      duration: '2:30',
-      thumbnail: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?auto=format&fit=crop&w=1200&q=80',
-      embedUrl: 'https://www.youtube.com/embed/placeholder',
-      desc: '[DEMO] Smooth sidewalks and early morning running conditions across the Bole commercial corridor.'
+      desc: '[DEMO] Visual preview of high-altitude eucalyptus trails.'
     }
   ],
   communities: [
@@ -86,7 +85,7 @@ export const DB = {
       activity: 'run',
       area: 'Addis Ababa',
       schedule: 'Fri & Sun Mornings',
-      description: '[DEMO] Discipline, health, and community around endurance running across Addis Ababa.',
+      description: '[DEMO] Discipline, health, and community around endurance running.',
       experienceLevels: 'All Levels',
       telegram: 'https://t.me/bertusew',
       verified: true
@@ -102,34 +101,17 @@ export const DB = {
       startTime: '06:30 AM',
       location: 'Entoto Park Gate',
       distance: '5K / 10K',
-      description: '[DEMO] Steady conversational morning run followed by traditional Ethiopian coffee.',
+      description: '[DEMO] Steady conversational morning run.',
       status: 'UPCOMING',
       registrationEnabled: true
     }
-  ],
-  challenges: [
-    { id: 'ch1', title: 'First 5K Milestone', description: 'Complete your first continuous 5K run session.', target: 5, unit: 'KM', progress: 0, status: 'Active', badgeId: 'b2' }
   ],
   badges: [
     { id: 'b1', name: 'FIRST STEP', icon: '👟', desc: 'Complete your first activity.', unlocked: true },
     { id: 'b2', name: 'FIRST 5K', icon: '🏃', desc: 'Complete a 5K session.', unlocked: false }
   ],
   territories: [
-    { id: 't1', name: 'Bole & Airport Zone', status: 'UNLOCKED', icon: '✈️', desc: 'Urban tarmac corridors and commercial running zones.', routesCount: 3 },
-    { id: 't2', name: 'Entoto Mountain Range', status: 'LOCKED', icon: '🌲', desc: 'High-altitude eucalyptus forests and ridge trails.', routesCount: 5 },
-    { id: 't3', name: 'Meskel Square & Stadium Hub', status: 'LOCKED', icon: '🏟️', desc: 'The historic heart of Ethiopian running culture.', routesCount: 2 },
-    { id: 't4', name: 'Sidist Kilo & University Zone', status: 'LOCKED', icon: '🏛️', desc: 'Historic streets and campus green spaces.', routesCount: 4 }
-  ],
-  impactMetrics: {
-    routesAvailable: 12,
-    communitiesListed: 4,
-    eventsScheduled: 3,
-    activitiesRecorded: 145,
-    statusNote: '[DEMO METRIC]'
-  },
-  telegramConfig: {
-    botUsername: '@AddisActiveBot',
-    channel: '@AddisActiveOfficial',
-    group: '@AddisActiveCommunity'
-  }
+    { id: 't1', name: 'Bole & Airport Zone', status: 'UNLOCKED', icon: '✈️', desc: 'Urban tarmac corridors.', routesCount: 3 },
+    { id: 't2', name: 'Entoto Mountain Range', status: 'LOCKED', icon: '🌲', desc: 'High-altitude eucalyptus forests.', routesCount: 5 }
+  ]
 };
