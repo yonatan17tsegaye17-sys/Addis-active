@@ -16,23 +16,27 @@ class AddisActiveApp {
   }
 
   init() {
-    this.checkUserOnboarding();
+    // Hide splash screen immediately to prevent freezing
+    const splash = document.getElementById('splashScreen');
+    if (splash) {
+      splash.classList.add('fade-out');
+      setTimeout(() => splash.remove(), 400);
+    }
+
     this.setupEventListeners();
     this.getUserLocation();
-
-    setTimeout(() => {
-      const splash = document.getElementById('splashScreen');
-      if (splash) splash.classList.add('fade-out');
-    }, 600);
+    this.checkUserOnboarding();
   }
 
   checkUserOnboarding() {
     const saved = localStorage.getItem('addis_active_profile');
     if (saved) {
       DB.userProfile = JSON.parse(saved);
+      this.renderView('home');
     } else {
       const modal = document.getElementById('onboardingModal');
       if (modal) modal.style.display = 'flex';
+      this.renderView('home');
     }
   }
 
@@ -131,7 +135,6 @@ class AddisActiveApp {
   }
 
   getSortedRoutes() {
-    // Sort routes by proximity to userCoords using Haversine
     return [...DB.routes].sort((a, b) => {
       const distA = this.calcHaversine(this.userCoords[0], this.userCoords[1], a.coords[0], a.coords[1]);
       const distB = this.calcHaversine(this.userCoords[0], this.userCoords[1], b.coords[0], b.coords[1]);
