@@ -1,5 +1,13 @@
 export const DB = {
   version: "1.0.0-beta",
+  userProfile: {
+    username: 'Addis Runner',
+    homeArea: 'Bole / Edna Mall',
+    primaryActivity: 'run',
+    fitnessLevel: 'Recreational',
+    totalDistanceLogged: '14.5 KM',
+    activeChallengesCount: 1
+  },
   activitiesMeta: {
     run: { title: 'Running', icon: '🏃', desc: 'From sunrise tarmac loops to high-altitude endurance engines.' },
     walk: { title: 'Walking', icon: '🚶', desc: 'Urban promenades, green parks, and community stride sessions.' },
