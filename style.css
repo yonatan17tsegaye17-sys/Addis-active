@@ -111,10 +111,11 @@ body {
 .m-val { font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; }
 .m-lbl { font-family: var(--font-tech); font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; }
 
+/* Fixed Action Sheet Overlay: hidden by default so clicks pass through */
 .action-sheet-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 4000; display: flex; align-items: flex-end; opacity: 0; visibility: hidden; transition: opacity 0.25s ease;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 4000; display: none; align-items: flex-end;
 }
-.action-sheet-overlay.active { opacity: 1; visibility: visible; }
+.action-sheet-overlay.active { display: flex; }
 .action-sheet-content {
   background: #141414; border-top: 1px solid var(--border-color); width: 100%; max-width: 700px; margin: 0 auto; border-radius: 20px 20px 0 0; padding: 1.5rem; max-height: 85vh; overflow-y: auto;
 }
