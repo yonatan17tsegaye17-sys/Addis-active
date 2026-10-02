@@ -179,26 +179,75 @@ class AddisActiveApp {
   }
 
   getHomeHTML() {
-    const profile = DB.userProfile || { username: 'Athlete', homeArea: 'Bole', primaryActivity: 'run', xp: 0, level: 1 };
-    const sortedRoutes = this.getSortedRoutes().slice(0, 4);
-    const actMeta = DB.activitiesMeta[profile.primaryActivity] || DB.activitiesMeta['run'];
+    const profile = DB.userProfile || { username: 'Athlete', homeArea: 'Bole', primaryActivity: 'run', xp: 50, level: 1 };
+    const sortedRoutes = this.getSortedRoutes().slice(0, 3);
+    const xpPercent = Math.min(100, (profile.xp / 150) * 100);
 
     return `
-      <div class="hero-box">
-        <div class="location-tag"><span class="brand-dot"></span><span>ADDIS ABABA • 2,355M ALTITUDE</span></div>
-        <h2 class="hero-title">GOOD MORNING, ${profile.username.toUpperCase()}</h2>
-        <p class="hero-tagline">LVL ${profile.level} ATHLETE • ${profile.xp} XP</p>
-        <p class="hero-desc">Engine tuned for ${actMeta.title} ${actMeta.icon} across Addis corridors.</p>
-        <div class="hero-btns">
-          <button class="btn btn-primary" onclick="window.app.renderView('explore')">Explore Addis 🗺️</button>
-          <button class="btn btn-outline" id="heroTrackBtn">Start GPS Session</button>
+      <!-- Strava-Style Social & Gamified Home Feed Header -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+        <div>
+          <span class="section-subtitle">Addis Ababa • 2,355m Altitude</span>
+          <h2 style="font-family:var(--font-display); font-size:1.5rem; font-weight:800;">Feed & Discovery</h2>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="window.app.renderView('activity')">⚡ Record Session</button>
+      </div>
+
+      <!-- Athlete Status & Territory Kiosk Banner -->
+      <div class="card" style="background:linear-gradient(135deg, #181818 0%, #101010 100%); border-color:rgba(204,255,0,0.3);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <div>
+            <span style="font-family:var(--font-display); font-size:1.1rem; font-weight:800;">${profile.username}</span>
+            <div style="font-family:var(--font-tech); font-size:0.75rem; color:var(--accent-lime); margin-top:2px;">LVL ${profile.level} ATHLETE • ${profile.xp} XP</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="window.app.renderView('profile')">View Profile</button>
+        </div>
+        <div style="width:100%; height:6px; background:#222; border-radius:3px; overflow:hidden; margin-bottom:0.75rem;">
+          <div style="width:${xpPercent}%; height:100%; background:var(--accent-lime);"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted);">
+          <span>🗺️ Territories: 1/4 Unlocked</span>
+          <span style="color:var(--accent-lime); cursor:pointer;" onclick="window.app.renderView('profile')">View Map Progress →</span>
         </div>
       </div>
 
+      <!-- Strava-Style Social Activity Pulse (Community Feed) -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <span style="font-family:var(--font-display); font-size:1.05rem; font-weight:700;">👥 Community Activity Pulse</span>
+          <span class="badge">[DEMO]</span>
+        </div>
+        
+        <div style="display:flex; flex-direction:column; gap:0.75rem;">
+          <div style="background:#181818; padding:0.85rem; border-radius:10px; border:1px solid #222;">
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted); margin-bottom:0.3rem;">
+              <span><strong>Ephrem T.</strong> • Bertusew Running Club</span>
+              <span>2 hours ago</span>
+            </div>
+            <div style="font-size:0.95rem; font-weight:600; margin-bottom:0.3rem;">Completed Entoto Forest Ridge Loop 🌲</div>
+            <div style="display:flex; gap:1rem; font-family:var(--font-tech); font-size:0.75rem; color:var(--accent-lime);">
+              <span>📏 10.5 km</span><span>⏱️ 1h 12m</span><span>⚡ Elevation +340m</span>
+            </div>
+          </div>
+
+          <div style="background:#181818; padding:0.85rem; border-radius:10px; border:1px solid #222;">
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted); margin-bottom:0.3rem;">
+              <span><strong>Hanna M.</strong> • Addis Urban Cyclists</span>
+              <span>Yesterday</span>
+            </div>
+            <div style="font-size:0.95rem; font-weight:600; margin-bottom:0.3rem;">Jemo Residential Circuit 🚴</div>
+            <div style="display:flex; gap:1rem; font-family:var(--font-tech); font-size:0.75rem; color:var(--accent-lime);">
+              <span>📏 12.0 km</span><span>⏱️ 45m</span><span>⚡ Tarmac Ride</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nearest to You Discovery -->
       <div class="card">
         <span class="section-subtitle">Addis Active Today</span>
         <h3 class="section-title">📍 Nearest to You</h3>
-        <p class="section-desc">Sorted dynamically by your current GPS position with full route telemetry.</p>
+        <p class="section-desc">Sorted dynamically by your current GPS position.</p>
         <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.75rem;">
           ${sortedRoutes.map(r => `
             <div class="card" style="margin-bottom:0; display:flex; flex-direction:column; justify-content:space-between;">
@@ -210,7 +259,7 @@ class AddisActiveApp {
                 <span class="badge">${DB.activitiesMeta[r.activity]?.icon || '📍'} ${r.activity.toUpperCase()} •${r.area}</span>
                 <h4 style="font-family:var(--font-display); font-size:1.1rem; margin:0.3rem 0;">${r.name}</h4>
                 <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.5rem;">${r.desc}</p>
-                <div style="font-size:0.75rem; color:var(--accent-lime); font-family:var(--font-tech); margin-bottom:0.75rem;">📏 ${r.distance} | ⚡ ${r.elevation} \vert{} 🧭 ${r.surface}</div>
+                <div style="font-size:0.75rem; color:var(--accent-lime); font-family:var(--font-tech); margin-bottom:0.75rem;">📏 ${r.distance} \vert{} ⚡${r.elevation}</div>
               </div>
               <button class="btn btn-outline btn-full btn-sm route-detail-btn" data-id="${r.id}">View Route Details</button>
             </div>
@@ -220,9 +269,7 @@ class AddisActiveApp {
     `;
   }
 
-  bindHomeEvents() {
-    document.getElementById('heroTrackBtn')?.addEventListener('click', () => this.renderView('activity'));
-  }
+  bindHomeEvents() {}
 
   getExploreHTML(filter) {
     this.currentExploreFilter = filter;
@@ -312,7 +359,7 @@ class AddisActiveApp {
             <option value="swim">Swimming 🏊</option>
             <option value="hike">Hiking 🥾</option>
             <option value="football">Football ⚽</option>
-            <option value="fitness">Fitness 🏋️️</option>
+            <option value="fitness">Fitness 🏋️</option>
           </select>
         </div>
 
@@ -490,7 +537,6 @@ class AddisActiveApp {
     const xpPercent = Math.min(100, (profile.xp / 150) * 100);
 
     return `
-      <!-- Strava-Inspired "You" Profile Layout -->
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
         <div>
           <h2 style="font-family:var(--font-display); font-size:1.6rem; font-weight:800;">${profile.username}</h2>
@@ -499,14 +545,12 @@ class AddisActiveApp {
         <button class="icon-btn" onclick="alert('Profile settings')">⚙️</button>
       </div>
 
-      <!-- Top Segment Tabs matching Strava You style -->
       <div style="display:flex; gap:1.5rem; border-bottom:1px solid var(--border-color); margin-bottom:1.25rem; font-family:var(--font-sans); font-weight:600; font-size:0.95rem;">
         <span style="color:var(--accent-lime); padding-bottom:0.5rem; border-bottom:2px solid var(--accent-lime); cursor:pointer;">Progress</span>
         <span style="color:var(--text-muted); padding-bottom:0.5rem; cursor:pointer;" onclick="alert('Workouts log coming soon')">Workouts</span>
         <span style="color:var(--text-muted); padding-bottom:0.5rem; cursor:pointer;" onclick="alert('Activities log coming soon')">Activities</span>
       </div>
 
-      <!-- Weekly Progress Card -->
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
           <span style="font-family:var(--font-display); font-size:1.1rem; font-weight:700;">This week</span>
@@ -517,20 +561,8 @@ class AddisActiveApp {
           <div class="metric-box"><div class="m-val">${profile.completedActivitiesCount * 25}m</div><div class="m-lbl">Time</div></div>
           <div class="metric-box"><div class="m-val">+140m</div><div class="m-lbl">Elev Gain</div></div>
         </div>
-        <div style="background:#181818; padding:1rem; border-radius:10px; border:1px solid var(--border-color); text-align:center;">
-          <div style="font-family:var(--font-tech); font-size:0.75rem; color:var(--text-muted); margin-bottom:0.5rem;">PROGRESSION CURVE (12 WEEKS)</div>
-          <div style="height:60px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 1rem;">
-            <div style="width:8px; height:20%; background:var(--border-color); border-radius:4px;"></div>
-            <div style="width:8px; height:35%; background:var(--border-color); border-radius:4px;"></div>
-            <div style="width:8px; height:50%; background:var(--border-color); border-radius:4px;"></div>
-            <div style="width:8px; height:40%; background:var(--border-color); border-radius:4px;"></div>
-            <div style="width:8px; height:75%; background:var(--accent-lime); border-radius:4px;"></div>
-            <div style="width:8px; height:60%; background:var(--accent-lime); border-radius:4px;"></div>
-          </div>
-        </div>
       </div>
 
-      <!-- Streak & Gamified Territory Card -->
       <div class="card" style="display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #181410 0%, var(--bg-card) 100%);">
         <div>
           <span class="section-subtitle">Consistency Streak</span>
@@ -540,7 +572,6 @@ class AddisActiveApp {
         <div style="font-size:2.5rem; background:rgba(255,102,0,0.15); padding:1rem; border-radius:14px; border:1px solid rgba(255,102,0,0.3);">⚡</div>
       </div>
 
-      <!-- Territory & Gamification Progress -->
       <div class="card">
         <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">🗺️ Gamified Territory Exploration</h4>
         <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Unlock municipal zones as your athlete level and XP increase.</p>
@@ -557,7 +588,6 @@ class AddisActiveApp {
         </div>
       </div>
 
-      <!-- Personal Goals -->
       <div class="card" style="border-color:var(--accent-lime);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
           <h4 style="font-family:var(--font-display); font-size:1.1rem;">🎯 Personal Goals</h4>
