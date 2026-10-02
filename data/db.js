@@ -8,7 +8,7 @@ export const DB = {
     swim: { title: 'Swimming', icon: '🏊', desc: 'Pool facilities, aquatic training, and fitness laps.' },
     hike: { title: 'Hiking', icon: '🥾', desc: 'Mountain trails, eucalyptus forests, and ridge scrambles.' },
     football: { title: 'Football', icon: '⚽', desc: 'Pitch matches, turf fields, and community games.' },
-    fitness: { title: 'Fitness', icon: '🏋️', desc: 'Outdoor workouts, strength conditioning, and functional movement.' }
+    fitness: { title: 'Fitness', icon: '🏋️️', desc: 'Outdoor workouts, strength conditioning, and functional movement.' }
   },
   routes: [
     { id: 'r1', name: 'Entoto Forest Ridge Loop', activity: 'hike', area: 'Entoto Mountain', distance: '10.5 KM', elevation: '+340m Gain', difficulty: 'Challenging', estimatedTime: '1h 45m', startingPoint: 'Entoto Gate 1', surface: 'Trail / Loose Gravel', facilities: ['Parking', 'Restrooms', 'Water'], desc: 'High-altitude trail winding through eucalyptus canopy.', communityNotes: 'Bring hydration.', videoTitle: 'Entoto Mountain Ridge Walkthrough', videoDuration: '3:45', coords: [9.0765, 38.7421], image: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1200&q=80' },
