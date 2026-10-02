@@ -19,8 +19,10 @@ class AddisActiveApp {
   init() {
     const splash = document.getElementById('splashScreen');
     if (splash) {
-      splash.style.opacity = '0';
-      setTimeout(() => splash.remove(), 400);
+      setTimeout(() => {
+        splash.style.opacity = '0';
+        setTimeout(() => splash.remove(), 400);
+      }, 500);
     }
 
     this.setupEventListeners();
@@ -95,7 +97,6 @@ class AddisActiveApp {
       if (e.target === detailModal) detailModal.classList.remove('active');
     });
 
-    // Bulletproof Global Event Delegation for Explore Filters & Route Details
     document.addEventListener('click', (e) => {
       const detailBtn = e.target.closest('.route-detail-btn');
       if (detailBtn) {
@@ -303,7 +304,7 @@ class AddisActiveApp {
             <option value="swim">Swimming 🏊</option>
             <option value="hike">Hiking 🥾</option>
             <option value="football">Football ⚽</option>
-            <option value="fitness">Fitness 🏋️</option>
+            <option value="fitness">Fitness 🏋️️</option>
           </select>
         </div>
 
