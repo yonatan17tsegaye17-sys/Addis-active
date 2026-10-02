@@ -76,7 +76,8 @@
       </div>
       <div class="header-actions">
         <button id="searchTrigger" class="icon-btn" aria-label="Search">🔍</button>
-        <button class="icon-btn" data-link="profile" aria-label="Profile">👤</button>
+        <!-- Discreet Admin Trigger for City Pulse -->
+        <button class="icon-btn" id="adminPulseBtn" aria-label="Admin City Pulse" title="Admin City Pulse">🏛️</button>
       </div>
     </div>
   </header>
@@ -100,13 +101,13 @@
     </div>
   </div>
 
+  <!-- Strava-Style 5-Tab Bottom Navigation with Explore in Center -->
   <nav class="mobile-nav" aria-label="Bottom Navigation">
     <button class="nav-tab active" data-target="home"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></button>
-    <button class="nav-tab" data-target="explore"><span class="nav-icon">🗺️</span><span class="nav-text">Explore</span></button>
-    <button class="nav-tab" data-target="activity"><span class="nav-icon">⚡</span><span class="nav-text">Track</span></button>
-    <button class="nav-tab" data-target="community"><span class="nav-icon">👥</span><span class="nav-text">Community</span></button>
-    <button class="nav-tab" data-target="gov"><span class="nav-icon">🏛️</span><span class="nav-text">City Pulse</span></button>
-    <button class="nav-tab" data-target="profile"><span class="nav-icon">👤</span><span class="nav-text">Journey</span></button>
+    <button class="nav-tab" data-target="community"><span class="nav-icon">👥</span><span class="nav-text">Groups</span></button>
+    <button class="nav-tab center-explore" data-target="explore"><span class="nav-icon">🗺️</span><span class="nav-text">Explore</span></button>
+    <button class="nav-tab" data-target="activity"><span class="nav-icon">⚡</span><span class="nav-text">Record</span></button>
+    <button class="nav-tab" data-target="profile"><span class="nav-icon">👤</span><span class="nav-text">You</span></button>
   </nav>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
