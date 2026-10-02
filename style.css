@@ -111,7 +111,6 @@ body {
 .m-val { font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; }
 .m-lbl { font-family: var(--font-tech); font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; }
 
-/* Fixed Action Sheet Overlay: hidden by default so clicks pass through */
 .action-sheet-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 4000; display: none; align-items: flex-end;
 }
