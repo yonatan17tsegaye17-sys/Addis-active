@@ -59,6 +59,15 @@ class AddisActiveApp {
       });
     });
 
+    document.getElementById('adminPulseBtn')?.addEventListener('click', () => {
+      const pin = prompt('Enter Admin Passcode for City Pulse:');
+      if (pin === '2355') {
+        this.renderView('gov');
+      } else if (pin !== null) {
+        alert('Invalid admin passcode.');
+      }
+    });
+
     const searchTrigger = document.getElementById('searchTrigger');
     const searchModal = document.getElementById('searchModal');
     const searchClose = document.getElementById('searchClose');
@@ -181,7 +190,7 @@ class AddisActiveApp {
         <p class="hero-tagline">LVL ${profile.level} ATHLETE • ${profile.xp} XP</p>
         <p class="hero-desc">Engine tuned for ${actMeta.title} ${actMeta.icon} across Addis corridors.</p>
         <div class="hero-btns">
-          <button class="btn btn-primary" id="heroExploreBtn">Active Near Me</button>
+          <button class="btn btn-primary" onclick="window.app.renderView('explore')">Explore Addis 🗺️</button>
           <button class="btn btn-outline" id="heroTrackBtn">Start GPS Session</button>
         </div>
       </div>
@@ -212,7 +221,6 @@ class AddisActiveApp {
   }
 
   bindHomeEvents() {
-    document.getElementById('heroExploreBtn')?.addEventListener('click', () => this.renderView('explore'));
     document.getElementById('heroTrackBtn')?.addEventListener('click', () => this.renderView('activity'));
   }
 
@@ -222,9 +230,9 @@ class AddisActiveApp {
     const routes = filter === 'all' ? allRoutes : allRoutes.filter(r => r.activity === filter);
 
     return `
-      <span class="section-subtitle">Multi-Activity & Video Discovery</span>
-      <h3 class="section-title">Explore 23+ Addis Locations</h3>
-      <p class="section-desc">Classified strictly by exercise category (Running, Walking, Cycling, Swimming, Hiking, Football, Fitness).</p>
+      <span class="section-subtitle">Central Discovery</span>
+      <h3 class="section-title">Explore Addis Ababa</h3>
+      <p class="section-desc">Classified strictly by exercise category across 23+ high-altitude locations.</p>
       
       <div class="filter-bar">
         <button class="filter-chip ${filter === 'all' ? 'active':''}" data-filter="all">All</button>
@@ -434,9 +442,14 @@ class AddisActiveApp {
     const totalTerritories = DB.territories.length;
 
     return `
-      <span class="section-subtitle">Municipal Intelligence</span>
-      <h3 class="section-title">City Pulse Dashboard</h3>
-      <p class="section-desc">Professional overview of urban active-lifestyle infrastructure, corridors, and citizen engagement across Addis Ababa.</p>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <div>
+          <span class="section-subtitle">Admin Security Layer</span>
+          <h3 class="section-title">City Pulse Dashboard</h3>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="window.app.renderView('home')">✕ Exit Admin</button>
+      </div>
+      <p class="section-desc">Restricted municipal intelligence overview for authorized administrators only.</p>
 
       <div class="grid-2" style="margin-bottom:1rem;">
         <div class="card" style="margin-bottom:0;">
@@ -469,35 +482,82 @@ class AddisActiveApp {
           </div>
         </div>
       </div>
-
-      <div class="card">
-        <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">🏛️ Municipal Urban Zones (${totalTerritories} Tracked)</h4>
-        <div style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.85rem; color:var(--text-muted);">
-          ${DB.territories.map(t => `<div style="background:#181818; padding:0.75rem; border-radius:8px;">${t.icon} <strong>${t.name}</strong>: ${t.desc} (${t.routesCount} Active Zones)</div>`).join('')}
-        </div>
-      </div>
     `;
   }
 
   getProfileHTML() {
-    const profile = DB.userProfile || { username: 'Athlete', xp: 50, level: 1, activeGoals: [] };
+    const profile = DB.userProfile || { username: 'Athlete', xp: 50, level: 1, activeGoals: [], completedActivitiesCount: 0 };
     const xpPercent = Math.min(100, (profile.xp / 150) * 100);
 
     return `
-      <span class="section-subtitle">My Journey & Gamification</span>
-      <h3 class="section-title">${profile.username}'s Dashboard</h3>
-      <p class="section-desc">Level ${profile.level} Athlete • ${profile.xp} / 150 XP to Next Level</p>
-
-      <div class="card" style="background:#141810; border-color:rgba(204,255,0,0.3);">
-        <div style="display:flex; justify-content:space-between; font-family:var(--font-tech); font-size:0.8rem; margin-bottom:0.5rem;">
-          <span>LEVEL ${profile.level}</span>
-          <span style="color:var(--accent-lime);">${profile.xp} XP</span>
+      <!-- Strava-Inspired "You" Profile Layout -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <div>
+          <h2 style="font-family:var(--font-display); font-size:1.6rem; font-weight:800;">${profile.username}</h2>
+          <span class="badge">LVL ${profile.level} ATHLETE • ${profile.homeArea}</span>
         </div>
-        <div style="width:100%; height:8px; background:#222; border-radius:4px; overflow:hidden;">
-          <div style="width:${xpPercent}%; height:100%; background:var(--accent-lime); transition:width 0.4s ease;"></div>
+        <button class="icon-btn" onclick="alert('Profile settings')">⚙️</button>
+      </div>
+
+      <!-- Top Segment Tabs matching Strava You style -->
+      <div style="display:flex; gap:1.5rem; border-bottom:1px solid var(--border-color); margin-bottom:1.25rem; font-family:var(--font-sans); font-weight:600; font-size:0.95rem;">
+        <span style="color:var(--accent-lime); padding-bottom:0.5rem; border-bottom:2px solid var(--accent-lime); cursor:pointer;">Progress</span>
+        <span style="color:var(--text-muted); padding-bottom:0.5rem; cursor:pointer;" onclick="alert('Workouts log coming soon')">Workouts</span>
+        <span style="color:var(--text-muted); padding-bottom:0.5rem; cursor:pointer;" onclick="alert('Activities log coming soon')">Activities</span>
+      </div>
+
+      <!-- Weekly Progress Card -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <span style="font-family:var(--font-display); font-size:1.1rem; font-weight:700;">This week</span>
+          <span class="badge">XP: ${profile.xp}</span>
+        </div>
+        <div class="metrics-row" style="grid-template-columns: repeat(3, 1fr); margin-bottom:1rem;">
+          <div class="metric-box"><div class="m-val">${(profile.completedActivitiesCount * 3.5).toFixed(1)} km</div><div class="m-lbl">Distance</div></div>
+          <div class="metric-box"><div class="m-val">${profile.completedActivitiesCount * 25}m</div><div class="m-lbl">Time</div></div>
+          <div class="metric-box"><div class="m-val">+140m</div><div class="m-lbl">Elev Gain</div></div>
+        </div>
+        <div style="background:#181818; padding:1rem; border-radius:10px; border:1px solid var(--border-color); text-align:center;">
+          <div style="font-family:var(--font-tech); font-size:0.75rem; color:var(--text-muted); margin-bottom:0.5rem;">PROGRESSION CURVE (12 WEEKS)</div>
+          <div style="height:60px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 1rem;">
+            <div style="width:8px; height:20%; background:var(--border-color); border-radius:4px;"></div>
+            <div style="width:8px; height:35%; background:var(--border-color); border-radius:4px;"></div>
+            <div style="width:8px; height:50%; background:var(--border-color); border-radius:4px;"></div>
+            <div style="width:8px; height:40%; background:var(--border-color); border-radius:4px;"></div>
+            <div style="width:8px; height:75%; background:var(--accent-lime); border-radius:4px;"></div>
+            <div style="width:8px; height:60%; background:var(--accent-lime); border-radius:4px;"></div>
+          </div>
         </div>
       </div>
 
+      <!-- Streak & Gamified Territory Card -->
+      <div class="card" style="display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg, #181410 0%, var(--bg-card) 100%);">
+        <div>
+          <span class="section-subtitle">Consistency Streak</span>
+          <h3 style="font-family:var(--font-display); font-size:1.8rem; font-weight:800; color:#ff6600;">🔥 ${Math.max(1, profile.completedActivitiesCount)} Weeks</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted);">Active consistency across Addis high-altitude corridors.</p>
+        </div>
+        <div style="font-size:2.5rem; background:rgba(255,102,0,0.15); padding:1rem; border-radius:14px; border:1px solid rgba(255,102,0,0.3);">⚡</div>
+      </div>
+
+      <!-- Territory & Gamification Progress -->
+      <div class="card">
+        <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">🗺️ Gamified Territory Exploration</h4>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Unlock municipal zones as your athlete level and XP increase.</p>
+        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:0.75rem;">
+          ${DB.territories.map(t => `
+            <div style="background:#181818; border:1px solid ${profile.xp >= t.xpRequired ? 'var(--accent-lime)' : 'var(--border-color)'}; padding:0.75rem; border-radius:10px;">
+              <div style="font-size:1.5rem; margin-bottom:0.2rem;">${t.icon}</div>
+              <div style="font-family:var(--font-display); font-size:0.9rem; font-weight:700;">${t.name}</div>
+              <div style="font-family:var(--font-tech); font-size:0.65rem; color:${profile.xp >= t.xpRequired ? 'var(--accent-lime)' : 'var(--text-dim)'}; margin-top:0.2rem;">
+                ${profile.xp >= t.xpRequired ? 'EXPLORED ⚡' : `NEEDS ${t.xpRequired} XP`}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Personal Goals -->
       <div class="card" style="border-color:var(--accent-lime);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
           <h4 style="font-family:var(--font-display); font-size:1.1rem;">🎯 Personal Goals</h4>
@@ -511,34 +571,6 @@ class AddisActiveApp {
                 <span style="font-family:var(--font-tech); color:var(--accent-lime);">${g.progress} /${g.target}</span>
               </div>
               <div style="font-family:var(--font-tech); font-size:0.65rem; color:var(--text-dim);">${g.status}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-
-      <div class="card">
-        <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">Territory Exploration</h4>
-        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:0.75rem; margin-top:0.75rem;">
-          ${DB.territories.map(t => `
-            <div style="background:#181818; border:1px solid ${profile.xp >= t.xpRequired ? 'var(--accent-lime)' : 'var(--border-color)'}; padding:0.75rem; border-radius:10px;">
-              <div style="font-size:1.5rem; margin-bottom:0.2rem;">${t.icon}</div>
-              <div style="font-family:var(--font-display); font-size:0.9rem; font-weight:700;">${t.name}</div>
-              <div style="font-family:var(--font-tech); font-size:0.65rem; color:${profile.xp >= t.xpRequired ? 'var(--accent-lime)' : 'var(--text-dim)'}; margin-top:0.2rem;">
-                ${profile.xp >= t.xpRequired ? 'EXPLORED ⚡' : `NEEDS ${t.xpRequired} XP`}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-
-      <div class="card">
-        <h4 style="font-family:var(--font-display); font-size:1.1rem; margin-bottom:0.5rem;">Badges & Achievements</h4>
-        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:0.75rem; margin-top:0.75rem;">
-          ${DB.badges.map(b => `
-            <div style="background:#181818; border:1px solid ${profile.completedActivitiesCount > 0 ? 'var(--accent-lime)' : 'var(--border-color)'}; padding:0.75rem; border-radius:10px; text-align:center;">
-              <div style="font-size:1.8rem; margin-bottom:0.2rem;">${b.icon}</div>
-              <div style="font-family:var(--font-display); font-size:0.85rem; font-weight:700;">${b.name}</div>
-              <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.2rem;">${b.desc}</div>
             </div>
           `).join('')}
         </div>
