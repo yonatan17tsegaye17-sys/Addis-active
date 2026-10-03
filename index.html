@@ -6,7 +6,7 @@
   <title>Addis Active | Discover Addis • Move Addis • Connect Addis</title>
   
   <link rel="manifest" href="./manifest.webmanifest">
-  <meta name="theme-color" content="#080808">
+  <meta name="theme-color" content="#060606">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -15,7 +15,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-  <link rel="stylesheet" href="./style.css">
+  <!-- Cache-busting parameter added to force immediate visual update -->
+  <link rel="stylesheet" href="./style.css?v=3">
 </head>
 <body>
 
@@ -38,11 +39,11 @@
       <form id="onboardingForm" style="display:flex; flex-direction:column; gap:1rem;">
         <div>
           <label style="font-size:0.8rem; font-family:var(--font-tech); color:var(--text-muted);">YOUR NAME / HANDLE</label>
-          <input type="text" id="setupName" placeholder="e.g. Dawit M." required style="width:100%; background:#181818; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:8px; margin-top:0.3rem;">
+          <input type="text" id="setupName" placeholder="e.g. Dawit M." required style="width:100%; background:#161616; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:12px; margin-top:0.3rem;">
         </div>
         <div>
           <label style="font-size:0.8rem; font-family:var(--font-tech); color:var(--text-muted);">PRIMARY ACTIVITY</label>
-          <select id="setupActivity" style="width:100%; background:#181818; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:8px; margin-top:0.3rem;">
+          <select id="setupActivity" style="width:100%; background:#161616; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:12px; margin-top:0.3rem;">
             <option value="run">Running 🏃</option>
             <option value="walk">Walking 🚶</option>
             <option value="bike">Cycling 🚴</option>
@@ -54,7 +55,7 @@
         </div>
         <div>
           <label style="font-size:0.8rem; font-family:var(--font-tech); color:var(--text-muted);">HOME CORRIDOR / AREA</label>
-          <input type="text" id="setupArea" placeholder="e.g. Bole / Edna Mall" required style="width:100%; background:#181818; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:8px; margin-top:0.3rem;">
+          <input type="text" id="setupArea" placeholder="e.g. Bole / Edna Mall" required style="width:100%; background:#161616; border:1px solid var(--border-color); color:#fff; padding:0.75rem; border-radius:12px; margin-top:0.3rem;">
         </div>
         <button type="submit" class="btn btn-primary btn-full" style="margin-top:0.5rem;">Launch Addis Active ⚡</button>
       </form>
@@ -76,7 +77,6 @@
       </div>
       <div class="header-actions">
         <button id="searchTrigger" class="icon-btn" aria-label="Search">🔍</button>
-        <!-- Discreet Admin Trigger for City Pulse -->
         <button class="icon-btn" id="adminPulseBtn" aria-label="Admin City Pulse" title="Admin City Pulse">🏛️</button>
       </div>
     </div>
